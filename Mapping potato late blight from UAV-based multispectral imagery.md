@@ -22,7 +22,7 @@ The experimental plot area was clipped by using a reference polygon (red polygon
 
 ## Study area:
 
-<img src="Imagenes/Figure1.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+<img src="Images/Figure1.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
     
 High resolution multispectral images were acquired at 40 m altitude above the ground surface at 11:00 am local time (GMT-5). Each 
 multispectral image acquired by the MicaSense camera had five bands as described in the next table.
@@ -74,9 +74,9 @@ of the field with an area of 216 sq.m., the space between rows was 1m. Each row 
 
 
 
-<img src="Imagenes/experimental_plot_a.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+<img src="Images/experimental_plot_a.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
 (a) May 12, 2018
-<img src="Imagenes/experimental_plot_b.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+<img src="Images/experimental_plot_b.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
 (b) May 26, 2018
 
 The layout of the experimental crop. The yellow lines indicate the division of the field into 18 experimental blocks. (a) May 12, 2018; (b) May 26, 2018.
@@ -144,7 +144,7 @@ plt.show()
 ```
 
 
-![png](output_7_0.png)
+![png](Images/output_7_0.png)
 
 
 ### Thresholding
@@ -183,7 +183,7 @@ plt.subplot(235), plt.bar(hist_range,hist_b5,0.01),plt.title('Near infrared')
 
 
 
-![png](output_9_1.png)
+![png](Images/output_9_1.png)
 
 
 
@@ -204,7 +204,7 @@ plt.show()
 ```
 
 
-![png](output_10_0.png)
+![png](Images/output_10_0.png)
 
 
 ### Masking image
@@ -235,7 +235,7 @@ plt.show()
 ```
 
 
-![png](output_12_0.png)
+![png](Images/output_12_0.png)
 
 
 Here we can see how looks any band from the multispectral image after masking process. It can be seen how the ground surface does not appear any more.
@@ -259,7 +259,7 @@ plt.show()
 ```
 
 
-![png](output_14_0.png)
+![png](Images/output_14_0.png)
 
 
 We can now create a false colour composition to improve the visualization of the background removing step. This was performed for visualisation purposes only:
@@ -299,11 +299,11 @@ plt.show()
 ```
 
 
-![png](output_17_0.png)
+![png](Images/output_17_0.png)
 
 
 
-![png](output_17_1.png)
+![png](Images/output_17_1.png)
 
 
 ### Segmented bands to files
@@ -605,7 +605,7 @@ class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_l
 
 
 
-![png](output_24_2.png)
+![png](Images/output_24_2.png)
 
 
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
@@ -616,11 +616,11 @@ class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_l
 
 
 
-![png](output_24_4.png)
+![png](Images/output_24_4.png)
 
 
 
-![png](output_24_5.png)
+![png](Images/output_24_5.png)
 
 
 
@@ -642,7 +642,7 @@ plt.show()
 ```
 
 
-![png](output_26_0.png)
+![png](Images/output_26_0.png)
 
 
 
@@ -666,7 +666,7 @@ plt.show()
 ```
 
 
-![png](output_27_0.png)
+![png](Images/output_27_0.png)
 
 
 
@@ -701,7 +701,7 @@ plt.show()
 ```
 
 
-![png](output_30_0.png)
+![png](Images/output_30_0.png)
 
 
 ### Random forest:
