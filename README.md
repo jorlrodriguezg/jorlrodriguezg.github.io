@@ -1,39 +1,17 @@
-## Welcome to GitHub Pages
+## Welcome to jorlrodriguezg page
 
-You can use the [editor on GitHub](https://github.com/jorlrodriguezg/jorlrodriguezg.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Remote sensing tutorials 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Here you'll find a series of tutorials for image processing oriented to remote sensing. 
 
-### Markdown
+### 1. Python for remote sensing
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+##### - [Cirrus correction Landsat 8](Cirrus_Correction_All_Bands_L8.md)
+##### - [Mapping potato late blight](Mapping_potato_late_blight_from_UAV-based_multispectral_imagery.md)
 
-```markdown
-Syntax highlighted code block
+Do you want to contribute? [Drop us an e-mail](mailto:jorodriguezga@unal.edu.co.com) and we’ll help you sort it out.
 
-# Header 1
-## Header 2
-### Header 3
+*Source code of the tutorials comes with no warranty. Use it at your own risk.*
+*Information here presented is not intended to achieve any commercial profit.*
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/jorlrodriguezg/jorlrodriguezg.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
-
-[Tutorial 1](Cirrus_Correction_All_Bands_L8.ipynb)
