@@ -6,7 +6,12 @@ Here you'll find a series of tutorials for image processing oriented to remote s
 
 ### 1. Python for remote sensing
 
+#### Satellite imagery
+
 ##### - [Cirrus correction Landsat 8](Cirrus_Correction_All_Bands_L8.md)
+
+#### UAV imagery
+
 ##### - [Mapping potato late blight](Mapping_potato_late_blight_from_UAV-based_multispectral_imagery.md)
 
 Do you want to contribute? [Drop us an e-mail](mailto:jorodriguezga@unal.edu.co.com) and we’ll help you sort it out.
