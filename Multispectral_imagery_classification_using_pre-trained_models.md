@@ -13,10 +13,7 @@ email: jorodriguezga@unal.edu.co
 ## Introduction
 
 The first tutorial allowed us to train 5 models for classification: Random forest, Gradient Boost Classifier, Support Vector Classifier, Linear Support Vector Classifier, and K-Nearest Neighbours. 
-
-This work proposes a method to process high resolution multispectral images for detection and mapping late blight in potato crops.
-It is based on three main aspects: (i) radiometric and geometric correction of the raw images; (ii) morphological operations for background removing;
-(iii) model trainig and supervised classification stage using a random forest classifier; and (iv) implementation of trained model in a new dataset.
+Now we are going to use those models to classify a new dataset: May 26, 2018. Multispectral images of this dataset were acquired in when late blight disease affected most of the potato crop.
 
 # Data and methods
 
@@ -25,6 +22,68 @@ The study area is a 1920 sq.m. potato field located in Subachoque, Colombia (see
 Mosaic generated extend over 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
 a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato.
 The experimental plot area was clipped by using a reference polygon (red polygon).
+
+## Study area:
+
+<img src="Images/Figure1.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+    
+High resolution multispectral images were acquired at 40 m altitude above the ground surface at 11:00 am local time (GMT-5). Each 
+multispectral image acquired by the MicaSense camera had five bands as described in the next table.
+In this work camera bands 4 and 5 have been reset according to the following order: Blue (B);
+Green (G); Red (R); Red edge (RE) and Near infrared (NIR).
+
+<table class="tg">
+  <tr>
+    <th class="tg-0pky"># Banda</th>
+    <th class="tg-0lax">Nombre</th>
+    <th class="tg-0lax">Centro de Banda (nm)</th>
+    <th class="tg-0lax">Ancho Banda FWHM (nm)</th>
+  </tr>
+  <tr>
+    <td class="tg-0lax">1</td>
+    <td class="tg-0lax">Azul</td>
+    <td class="tg-0lax">475</td>
+    <td class="tg-0lax">20</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">Verde</td>
+    <td class="tg-0lax">560</td>
+    <td class="tg-0lax">20</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">Rojo</td>
+    <td class="tg-0lax">668</td>
+    <td class="tg-0lax">10</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">4</td>
+    <td class="tg-0lax">Infrarrojo cercano<br></td>
+    <td class="tg-0lax">840</td>
+    <td class="tg-0lax">40</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-0lax">Borde Rojo</td>
+    <td class="tg-0lax">717</td>
+    <td class="tg-0lax">10</td>
+  </tr>
+</table>
+
+
+Experimental crop area consisted of an array of 18 blocks of 12 m $\times$ 8 m inside of a field of 77 m $\times$ 24 m. Each block had 9 rows arranged along the long side
+of the field with an area of 216 sq.m., the space between rows was 1m. Each row contained approximately 30 seed tubers of the same variety. 
+
+
+
+<img src="Images/experimental_plot_a.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+(a) May 12, 2018
+<img src="Images/experimental_plot_b.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+(b) May 26, 2018
+
+The layout of the experimental crop. The yellow lines indicate the division of the field into 18 experimental blocks. (a) May 12, 2018; (b) May 26, 2018.
+
 
 
 ```python
