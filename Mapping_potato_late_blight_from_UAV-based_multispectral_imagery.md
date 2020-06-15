@@ -22,7 +22,7 @@ The experimental plot area was clipped by using a reference polygon (red polygon
 
 ## Study area:
 
-<img src="Images/Figure1.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+<img src="Images/Figure1.png" alt="Imagen" width = "700" height="450" style="border: black 2px solid;" >
     
 High resolution multispectral images were acquired at 40 m altitude above the ground surface at 11:00 am local time (GMT-5). Each 
 multispectral image acquired by the MicaSense camera had five bands as described in the next table.
@@ -127,19 +127,19 @@ ds = gdal.Open('Raster/Correccion_reflectancia/MR_CE_20180512_Subachoque.tif')
 AZUL = ds.GetRasterBand(1).ReadAsArray()
 VERDE = ds.GetRasterBand(2).ReadAsArray()
 ROJO = ds.GetRasterBand(3).ReadAsArray()
-NIR = ds.GetRasterBand(4).ReadAsArray()
-REDEDGE = ds.GetRasterBand(5).ReadAsArray()
+REDEDGE = ds.GetRasterBand(4).ReadAsArray()
+NIR = ds.GetRasterBand(5).ReadAsArray()
 
 srs = ds.GetProjectionRef()
 geo_transform = ds.GetGeoTransform()
 
 plt.figure(1, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(321) ,plt.imshow(AZUL, cmap='gray'),plt.title('Banda azul')
-plt.subplot(322) ,plt.imshow(VERDE, cmap='gray'),plt.title('Banda verde')
-plt.subplot(323) ,plt.imshow(ROJO, cmap='gray'),plt.title('Banda roja')
-plt.subplot(324) ,plt.imshow(NIR, cmap='gray'),plt.title('Banda infrarroja')
-plt.subplot(325) ,plt.imshow(REDEDGE, cmap='gray'),plt.title('Banda borde rojo')
+plt.subplot(321) ,plt.imshow(AZUL, cmap='gray'),plt.title('Blue band')
+plt.subplot(322) ,plt.imshow(VERDE, cmap='gray'),plt.title('Green band')
+plt.subplot(323) ,plt.imshow(ROJO, cmap='gray'),plt.title('Red band')
+plt.subplot(324) ,plt.imshow(REDEDGE, cmap='gray'),plt.title('Red edge band')
+plt.subplot(325) ,plt.imshow(NIR, cmap='gray'),plt.title('Infrared band')
 plt.show()
 ```
 
@@ -176,9 +176,9 @@ plt.subplot(235), plt.bar(hist_range,hist_b5,0.01),plt.title('Near infrared')
 
 
 
-    (<matplotlib.axes._subplots.AxesSubplot at 0x7fae900306d8>,
+    (<matplotlib.axes._subplots.AxesSubplot at 0x7f7de52f4ef0>,
      <Container object of 100 artists>,
-     <matplotlib.text.Text at 0x7fae72ad9e48>)
+     <matplotlib.text.Text at 0x7f7df1098b38>)
 
 
 
@@ -315,37 +315,37 @@ Now we proceed to save each of the segmented bands:
 bands_out = np.stack([azul_seg,
                       verde_seg,
                       rojo_seg,
-                      nir_seg,
-                      rededge_seg],
+                      rededge_seg,
+                     nir_seg],
                      axis=2)
 
-band_names = {'M_2018-05-12_Corte_Seg_B1.tif',
-              'M_2018-05-12_Corte_Seg_B2.tif',
-             'M_2018-05-12_Corte_Seg_B3.tif',
-             'M_2018-05-12_Corte_Seg_B4.tif',
-             'M_2018-05-12_Corte_Seg_B5.tif'
+band_names = {'M_2018-05-12_Corte_Seg_B1.tif':0,
+              'M_2018-05-12_Corte_Seg_B2.tif':1,
+             'M_2018-05-12_Corte_Seg_B3.tif':2,
+             'M_2018-05-12_Corte_Seg_B4.tif':3,
+             'M_2018-05-12_Corte_Seg_B5.tif':4
              }
 dir_out = 'Raster/Segmented/'
-i=0
+
 for band_name in band_names:
     filename_output = dir_out + band_name
+    index = band_names[band_name]
     x_size = ds.RasterXSize  # Raster xsize
     y_size = ds.RasterYSize  # Raster ysize
     driver = gdal.GetDriverByName('GTiff')
     arch = driver.Create(filename_output,x_size,y_size,1,gdal.GDT_Float32)
     arch.SetGeoTransform(geo_transform)
     arch.SetProjection(srs)
-    arch.GetRasterBand(1).WriteArray(bands_out[:,:,i].astype(np.float32))
+    arch.GetRasterBand(1).WriteArray(bands_out[:,:,index].astype(np.float32))
     del(arch)
-    i +=1
     print("Band "+band_name+" exported")
 ```
 
-    Band M_2018-05-12_Corte_Seg_B5.tif exported
-    Band M_2018-05-12_Corte_Seg_B1.tif exported
-    Band M_2018-05-12_Corte_Seg_B4.tif exported
     Band M_2018-05-12_Corte_Seg_B3.tif exported
     Band M_2018-05-12_Corte_Seg_B2.tif exported
+    Band M_2018-05-12_Corte_Seg_B1.tif exported
+    Band M_2018-05-12_Corte_Seg_B4.tif exported
+    Band M_2018-05-12_Corte_Seg_B5.tif exported
 
 
 ## Supervised classification of dataset A and models training
@@ -390,7 +390,7 @@ def plot_time(dt):
 
     ax.barh(y_pos, performance, align='center')
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(people)
+    ax.set_yticklabels(methods)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel('Seconds')
     ax.set_title('Performance by method')
@@ -590,13 +590,13 @@ class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_l
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
     [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    0.2s
     [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:    0.7s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:    1.5s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:    1.7s finished
+    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:    1.8s finished
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    3.9s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   16.3s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   36.9s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   41.3s finished
+    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    4.1s
+    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   16.7s
+    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   38.7s
+    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   43.4s finished
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
     [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    0.0s
     [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:    0.0s
@@ -719,13 +719,13 @@ print(classification_report(y_true, y_pred_rf, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      0.96      0.98   4190374
-     Late blight       0.33      0.89      0.48    268850
-         Healthy       0.89      0.43      0.58    532752
+               0       1.00      0.95      0.97   4190379
+     Late blight       0.32      0.89      0.47    268848
+         Healthy       0.88      0.43      0.58    532749
     
-        accuracy                           0.90   4991976
-       macro avg       0.74      0.76      0.68   4991976
-    weighted avg       0.95      0.90      0.91   4991976
+        accuracy                           0.89   4991976
+       macro avg       0.73      0.76      0.68   4991976
+    weighted avg       0.95      0.89      0.91   4991976
     
 
 
@@ -741,13 +741,13 @@ print(classification_report(y_true, y_pred_gbc, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      0.96      0.98   4190374
-     Late blight       0.33      0.80      0.47    268850
-         Healthy       0.78      0.48      0.60    532752
+               0       1.00      0.95      0.97   4190379
+     Late blight       0.32      0.81      0.45    268848
+         Healthy       0.81      0.48      0.60    532749
     
-        accuracy                           0.90   4991976
-       macro avg       0.70      0.75      0.68   4991976
-    weighted avg       0.94      0.90      0.91   4991976
+        accuracy                           0.89   4991976
+       macro avg       0.71      0.75      0.68   4991976
+    weighted avg       0.94      0.89      0.91   4991976
     
 
 
@@ -762,13 +762,13 @@ print(classification_report(y_true, y_pred_svc, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      0.96      0.98   4190374
-     Late blight       0.33      0.86      0.48    268850
-         Healthy       0.87      0.47      0.61    532752
+               0       1.00      0.95      0.97   4190379
+     Late blight       0.32      0.86      0.47    268848
+         Healthy       0.87      0.47      0.61    532749
     
-        accuracy                           0.90   4991976
-       macro avg       0.73      0.76      0.69   4991976
-    weighted avg       0.95      0.90      0.91   4991976
+        accuracy                           0.89   4991976
+       macro avg       0.73      0.76      0.68   4991976
+    weighted avg       0.95      0.89      0.91   4991976
     
 
 
@@ -783,13 +783,13 @@ print(classification_report(y_true, y_pred_lsvc, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      0.96      0.98   4190374
-     Late blight       0.33      0.86      0.48    268850
-         Healthy       0.87      0.47      0.61    532752
+               0       1.00      0.95      0.97   4190379
+     Late blight       0.32      0.86      0.47    268848
+         Healthy       0.87      0.47      0.61    532749
     
-        accuracy                           0.90   4991976
-       macro avg       0.73      0.76      0.69   4991976
-    weighted avg       0.95      0.90      0.91   4991976
+        accuracy                           0.89   4991976
+       macro avg       0.73      0.76      0.68   4991976
+    weighted avg       0.95      0.89      0.91   4991976
     
 
 
@@ -804,13 +804,13 @@ print(classification_report(y_true, y_pred_knn, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      0.96      0.98   4190374
-     Late blight       0.33      0.87      0.48    268850
-         Healthy       0.87      0.43      0.58    532752
+               0       1.00      0.95      0.97   4190379
+     Late blight       0.32      0.87      0.46    268848
+         Healthy       0.87      0.43      0.58    532749
     
-        accuracy                           0.90   4991976
-       macro avg       0.73      0.75      0.68   4991976
-    weighted avg       0.95      0.90      0.91   4991976
+        accuracy                           0.89   4991976
+       macro avg       0.73      0.75      0.67   4991976
+    weighted avg       0.95      0.89      0.91   4991976
     
 
 
@@ -824,6 +824,5 @@ Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-28
 
 
 ```python
-
 
 ```
