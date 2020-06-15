@@ -8,7 +8,7 @@ Jorge Luis Rodríguez
 
 email: jorodriguezga@unal.edu.co
 
-# Tutorial 1 of 2 
+# Guide 1 of 2 
 
 ## Introduction
 
@@ -20,8 +20,8 @@ It is based on three main aspects: (i) radiometric and geometric correction of t
 
 The study area is a 1920 sq.m. potato field located in Subachoque, Colombia (see figure). This field is part of an experimental plot designed to evaluate the potato *Diacol capiro* variety response to different nutrient treatments. As the weather conditions favoured the appearance of late blight disease in several plots, the project had the chance to monitor the crop disease development. The experimental plot was  inspected every seven days during the entire crop life span (i.e. 120 days from planting to maturity). 
 
-Mosaic generated extend over 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
-a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato.
+The generated mosaic covered an area of 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
+a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato (*Diacol capiro*).
 The experimental plot area was clipped by using a reference polygon (red polygon).
 
 

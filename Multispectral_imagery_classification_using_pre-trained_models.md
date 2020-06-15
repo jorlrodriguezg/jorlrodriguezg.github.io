@@ -8,19 +8,19 @@ Jorge Luis Rodríguez
 
 email: jorodriguezga@unal.edu.co
 
-# Tutorial 2 of 2 
+# Guide 2 of 2 
 
 ## Introduction
 
 The first tutorial allowed us to train 5 models for classification: Random forest, Gradient Boost Classifier, Support Vector Classifier, Linear Support Vector Classifier, and K-Nearest Neighbours. 
-Now we are going to use those models to classify a new dataset: May 26, 2018. Multispectral images of this dataset were acquired in when late blight disease affected most of the potato crop.
+Now we are going to use those models to classify a new dataset: May 26, 2018. Multispectral images of this dataset were acquired when late blight disease affected most of the potato crop.
 
 # Data and methods
 
 The study area is a 1920 sq.m. potato field located in Subachoque, Colombia (see figure). This field is part of an experimental plot designed to evaluate the potato *Diacol capiro* variety response to different nutrient treatments. As the weather conditions favoured the appearance of late blight disease in several plots, the project had the chance to monitor the crop disease development. The experimental plot was  inspected every seven days during the entire crop life span (i.e. 120 days from planting to maturity). 
 
-Mosaic generated extend over 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
-a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato.
+The generated mosaic covered an area of 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
+a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato (*Diacol capiro*).
 The experimental plot area was clipped by using a reference polygon (red polygon).
 
 ## Study area:
@@ -349,7 +349,7 @@ for band_name in band_names:
     Band M_2018-05-26_Corte_Seg_B5.tif exported
 
 
-## Classification of dataset B
+## Classification of dataset: May 26, 2018
 
 ### Loading segmented bands
 
