@@ -14,7 +14,7 @@ ___
 
 #### UAV imagery
 
-##### - [Mapping potato late blight](Mapping_potato_late_blight_from_UAV-based_multispectral_imagery.html)
+##### - [Mapping potato late blight](Mapping_potato_late_blight_from_UAV-based_multispectral_imagery.md)
 
 Do you want to contribute? [Drop us an e-mail](mailto:jorodriguezga@unal.edu.co.com) and we’ll help you sort it out.
 
