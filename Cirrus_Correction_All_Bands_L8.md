@@ -5,52 +5,46 @@ In this guide I will show you how to perform a cloud correction of your Landasat
 **M. Xu, X. Jia and M. Pickering, "Automatic cloud removal for Landsat 8 OLI images using cirrus band," 2014 IEEE Geoscience and Remote Sensing Symposium, Quebec City, QC, 2014, pp. 2511-2514, doi: [10.1109/IGARSS.2014.6946983](https://ieeexplore.ieee.org/document/6946983).**
 
 
-## Base formal de la corrección
-
-El efecto de las nubes cirrus en las imágenes se puede modelar de acuerdo a la
-
-\begin{equation*}
-    y_i(u,v) = x_i^0(u,v) + x_i^c(u,v) \quad   i = 1,2 \dots 7,
-\end{equation*}
-
-donde, $y_i(u,v)$ es el nivel digital (ND) almacenado por el sensor OLI para la banda $i$ con $i$=1,2 …7, para el píxel ubicado en $(u,v)$. $x_i^0(u,v)$ es el verdadero ND asociado a la cobertura terrestre y $x_i^c(u,v)$ es la contribución de la nube cirrus en función de su densidad. Con la corrección se busca recuperar $x_i^0(u,v)$.
-
-Con base en los estudios de, y las observaciones de los autores, se plantea que $x_i^c(u,v)$ tiene una relación lineal con el ND $c(u,v)$ la banda cirrus.
-
-\begin{equation*}
-    x_i^c(u,v) = \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]
-\end{equation*}
-Con lo que finalmente la corrección de cada banda se realiza mediante la:
-
-\begin{equation*}
-\displaystyle
-   x_i^0(u,v) =  y_i(u,v) - \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]
-\end{equation*}
-
-De esta forma el  reto para poder conocer $x_i^0(u,v)$ es encontrar el factor de corrección $\alpha$ para cada una de las bandas.
-
-## Métodos para hallar $\alpha$
-
-Los autores proponen dos métodos para hallar el factor de corrección $\alpha$: método manual y método automático.
-
-### Método manual
-1. Identificación manual de áreas homogéneas en las bandas de la imagen. Ej. Identificación de cuerpos de agua clara.
-2. Regresión lineal para hallar los coeficientes $\alpha$ de cada banda.
+## Formal basis for correction
 
 
-El método manual demanda un esfuerzo significativo para hallar zonas homogéneas, extraer valores y realizar la regresión lineal, por lo que no fue implementado.
+The effect of cirrus clouds on images can be modeled according to the equation:
 
-### Método automático
+<a href="https://www.codecogs.com/eqnedit.php?latex=y_i(u,v)&space;=&space;x_i^0(u,v)&space;&plus;&space;x_i^c(u,v)&space;\quad&space;i&space;=&space;1,2&space;\dots&space;7," target="_blank"><img src="https://latex.codecogs.com/gif.latex?y_i(u,v)&space;=&space;x_i^0(u,v)&space;&plus;&space;x_i^c(u,v)&space;\quad&space;i&space;=&space;1,2&space;\dots&space;7," title="y_i(u,v) = x_i^0(u,v) + x_i^c(u,v) \quad i = 1,2 \dots 7," /></a>
+
+where, $y_i(u,v)$ is the digital number (DN) stored by the OLI sensor for the band $i$ con *i=1,2 …7,* for the pixel located in $(u,v)$. $x_i^0(u,v)$ is the true DN related to land cover, and $x_i^c(u,v)$ is the contribution of the cirrus cloud to the DN based on its density. The correction seeks to recover $x_i^0(u,v)$.
+
+The authors of the article suggest that $x_i^c(u,v)$ has a linear relationship with the ND $c(u,v)$ of the cirrus band.
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=x_i^c(u,v)&space;=&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^c(u,v)&space;=&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" title="x_i^c(u,v) = \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]" /></a>
 
 
-Este método se implementó en el aplicativo mediante 3 etapas: (i) determinación de tamaño de la ventana; (ii) recorrido y cálculo de regresión lineal entre cada banda y la banda Cirrus; (iii) filtrado de los $R^2$ mayores al umbral definido por el usuario y determinación de $\alpha$ a partir de ellos, \autoref{fig:metodo}. $\alpha$  se toma como el valor de la pendiente de la regresión con mayor $R^2$.
+With what finally the correction of each band is made by:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" title="x_i^0(u,v) = y_i(u,v) - \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]" /></a>
+
+De esta forma el  reto para poder conocer <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)" title="x_i^0(u,v)" /></a> es encontrar el factor de corrección <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a> para cada una de las bandas.
+
+## Methods to find <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a>
 
 
-El método no requiere de la creación de máscaras ya que la corrección depende de los valores de la banda cirrus. En la banda cirrus las zonas sin presencia de nubes cirrus corresponden a los ND más bajos de la banda por lo que $c(u,v) - min(c(u,v)) = 0$ luego, $x_i^0(u,v) =  y_i(u,v)$, es decir, que en las zonas sin presencia de nubes cirrus no se realiza corrección \autoref{fig:correcion}.
+The authors propose two methods to find the correction factor <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a>: manual method and automatic method. The automatic correction method is implemented in this guide.
+
+### Automatic correction method
+
+
+This method consists of 3 stages: 
+
+1. Window size definition.
+2. linear regression between each band and the Cirrus band for each window. 
+3. filtering of R ^ 2 greater than the user-defined threshold and determination of <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a> from them.<a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a>  it is taken as the value of the slope of the regression with greater R^2.
+
+
+The method does not require the creation of masks since the correction depends on the values ​​of the cirrus band. In the cirrus band, areas without the presence of cirrus clouds correspond to the lowest DN of the band, so <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?c(u,v)&space;-&space;min(c(u,v))&space;=&space;0$&space;luego,&space;$x_i^0(u,v)&space;=&space;y_i(u,v)" title="c(u,v) - min(c(u,v)) = 0$ luego, $x_i^0(u,v) = y_i(u,v)" /></a>, that is to say, that in areas without the presence of cirrus clouds no correction is made.
 
 
 
-<img src="Images/L8_RGB.png" />
+<img src="Images/cirrus/L8_RGB.png" />
 
 
 ```python
@@ -135,7 +129,7 @@ plt.show()
 ```
 
 
-![png](Images/output_6_0.png)
+![png](Images/cirrus/output_6_0.png)
 
 
 The Cirrus band from Landsat 8 is plotted below:
@@ -148,7 +142,7 @@ plt.show()
 ```
 
 
-![png](Images/output_8_0.png)
+![png](Images/cirrus/output_8_0.png)
 
 
 Now we will define a window:
@@ -280,6 +274,6 @@ plt.show()
 ```
 
 
-![png](Images/output_15_0.png)
+![png](Images/cirrus/output_15_0.png)
 
 

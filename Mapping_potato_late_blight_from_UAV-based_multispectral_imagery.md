@@ -697,7 +697,7 @@ print('The classified data include {n} classes: {classes}'.format(n=labels_class
 
 # Accuracy assessment of results
 
-## Call ground reference
+## Loading ground reference
 
 
 ```python
