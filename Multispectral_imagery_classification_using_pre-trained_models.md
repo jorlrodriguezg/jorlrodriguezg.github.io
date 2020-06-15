@@ -34,38 +34,38 @@ Green (G); Red (R); Red edge (RE) and Near infrared (NIR).
 
 <table class="tg">
   <tr>
-    <th class="tg-0pky"># Banda</th>
-    <th class="tg-0lax">Nombre</th>
-    <th class="tg-0lax">Centro de Banda (nm)</th>
-    <th class="tg-0lax">Ancho Banda FWHM (nm)</th>
+    <th class="tg-0pky"># Band</th>
+    <th class="tg-0lax">Name</th>
+    <th class="tg-0lax">Band center (nm)</th>
+    <th class="tg-0lax">Bandwidth FWHM (nm)</th>
   </tr>
   <tr>
     <td class="tg-0lax">1</td>
-    <td class="tg-0lax">Azul</td>
+    <td class="tg-0lax">Blue</td>
     <td class="tg-0lax">475</td>
     <td class="tg-0lax">20</td>
   </tr>
   <tr>
     <td class="tg-0lax">2</td>
-    <td class="tg-0lax">Verde</td>
+    <td class="tg-0lax">Green</td>
     <td class="tg-0lax">560</td>
     <td class="tg-0lax">20</td>
   </tr>
   <tr>
     <td class="tg-0lax">3</td>
-    <td class="tg-0lax">Rojo</td>
+    <td class="tg-0lax">Red</td>
     <td class="tg-0lax">668</td>
     <td class="tg-0lax">10</td>
   </tr>
   <tr>
     <td class="tg-0lax">4</td>
-    <td class="tg-0lax">Infrarrojo cercano<br></td>
+    <td class="tg-0lax">Near infrared<br></td>
     <td class="tg-0lax">840</td>
     <td class="tg-0lax">40</td>
   </tr>
   <tr>
     <td class="tg-0lax">5</td>
-    <td class="tg-0lax">Borde Rojo</td>
+    <td class="tg-0lax">Red edge</td>
     <td class="tg-0lax">717</td>
     <td class="tg-0lax">10</td>
   </tr>
