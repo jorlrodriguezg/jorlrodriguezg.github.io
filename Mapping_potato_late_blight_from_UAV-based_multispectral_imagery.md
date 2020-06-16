@@ -27,7 +27,7 @@ The experimental plot area was clipped by using a reference polygon (red polygon
 
 ## Study area:
 
-<img src="Images/Figure1.png" alt="Imagen" width = "700" height="350" style="border: black 2px solid;" >
+<img src="Images/Figure1.png" alt="Imagen" width = "700" height="550" style="border: black 2px solid;" >
     
 High resolution multispectral images were acquired at 40 m altitude above the ground surface at 11:00 am local time (GMT-5). Each 
 multispectral image acquired by the MicaSense camera had five bands as described in the next table.
