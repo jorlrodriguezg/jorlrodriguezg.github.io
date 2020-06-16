@@ -13,8 +13,8 @@ email: jorodriguezga@unal.edu.co
 ## Introduction
 
 This work proposes a method to process high resolution multispectral images for detection and mapping late blight in potato crops.
-It is based on three main aspects: (i) radiometric and geometric correction of the raw images; (ii) morphological operations for background removing;
-(iii) model trainig and supervised classification stage using a random forest classifier; and (iv) implementation of trained model in a new dataset.
+It is based on three main aspects: (i) morphological operations for background removing;
+(ii) model trainig and supervised classification stage using a random forest classifier; and (iii) use of trained models in the classification of a different dataset.
 
 # Data and methods
 

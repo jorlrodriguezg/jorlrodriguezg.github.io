@@ -2,7 +2,7 @@
 
 ## Remote sensing tutorials 
 
-Here you'll find a series of tutorials for image processing oriented to remote sensing. 
+Here you'll find a series of resources for image processing oriented to remote sensing. 
 
 ___
 
