@@ -23,7 +23,7 @@ So the correction of the bands is done with the equation:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" title="x_i^0(u,v) = y_i(u,v) - \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]" /></a>
 
-De esta forma el  reto para poder conocer <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)" title="x_i^0(u,v)" /></a> es encontrar el factor de corrección <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a> para cada una de las bandas.
+In this way, what must be found to know <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)" title="x_i^0(u,v)" /></a> is the correction factor <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a> for each of the bands.
 
 ## Methods to find <a target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\alpha}" title="\boldsymbol{\alpha}" /></a>
 
