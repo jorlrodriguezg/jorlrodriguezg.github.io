@@ -19,7 +19,7 @@ The authors of the article suggest that $x_i^c(u,v)$ has a linear relationship w
 <a href="https://www.codecogs.com/eqnedit.php?latex=x_i^c(u,v)&space;=&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^c(u,v)&space;=&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" title="x_i^c(u,v) = \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]" /></a>
 
 
-With what finally the correction of each band is made by:
+So the correction of the bands is done with the equation:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_i^0(u,v)&space;=&space;y_i(u,v)&space;-&space;\alpha&space;*&space;[c\left(u,v\right)&space;-&space;min&space;\left(c(u,v)\right)]" title="x_i^0(u,v) = y_i(u,v) - \alpha * [c\left(u,v\right) - min \left(c(u,v)\right)]" /></a>
 
