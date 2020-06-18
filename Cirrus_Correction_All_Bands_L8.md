@@ -68,10 +68,10 @@ The first step is to load image bands:
 
 
 ```python
-images_dir =x = [os.path.join(r,file) for r,d,f in os.walk("Bands/Subset") for file in f]
+images_dir =x = [os.path.join(r,file) for r,d,f in os.walk("Bands/") for file in f]
 print("Image bands in directory: ", len(images_dir), '\n')
 main_path = images_dir[0][:-6]
-#print(main_path)
+print(main_path)
 band_ids =['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B9']
 
 band_stack = []
@@ -81,11 +81,12 @@ cirrus =[]
 band_list = []
 for band in band_ids:
     if band != 'B8' and band != 'B9':
-        full_path = main_path + band + '.tif'
+        full_path = main_path + band + '.TIF'
+        print(full_path)
         ds = gdal.Open(full_path)
         band_stack.append(ds.GetRasterBand(1).ReadAsArray())
     elif band == 'B9':
-        full_path = main_path + band + '.tif'
+        full_path = main_path + band + '.TIF'
         ds = gdal.Open(full_path)
         cirrus.append(ds.GetRasterBand(1).ReadAsArray())
         srs = ds.GetProjectionRef()
@@ -101,8 +102,16 @@ print("Reference system: \n", srs, '\n')
 print("Transform: \n", GeoTransform, '\n')
 ```
 
-    Image bands in directory:  8 
+    Image bands in directory:  10 
     
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B1.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B2.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B3.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B4.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B5.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B6.TIF
+    Bands/LC08_L1TP_009053_20200430_20200430_01_RT_B7.TIF
     Multispectral bands found:  7 
     
     Cirrus found:  1 
@@ -111,9 +120,20 @@ print("Transform: \n", GeoTransform, '\n')
      PROJCS["WGS 84 / UTM zone 18N",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-75],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32618"]] 
     
     Transform: 
-     (438540.0, 30.0, 0.0, 1200570.0, 0.0, -30.0) 
+     (409185.0, 30.0, 0.0, 1234515.0, 0.0, -30.0) 
     
 
+
+
+```python
+# Contrast stretch function for enhance the bands
+# Only for visualization purposes
+def enhance_band(band, min_in= 1000, max_in= 30000):
+    min_setup = 0.0
+    max_setup = 1.0
+    enhanced = (band-min_in)*(((max_setup-min_setup)/(max_in-min_in))+min_setup)
+    return enhanced
+```
 
 Now we can plot the bands:
 
@@ -145,27 +165,85 @@ plt.show()
 ![png](Images/cirrus/output_8_0.png)
 
 
+
+```python
+def get_min_band(array):
+    min_array = np.ndarray.min(array[np.nonzero(array)])
+    
+    return min_array
+
+def get_max_band(array):
+    max_array = np.ndarray.max(array[np.nonzero(array)])
+    
+    return max_array
+```
+
+
+```python
+red_array = band_stack[3].astype(np.uint16)
+
+
+print(red_array.min())
+print(red_array.max())
+print(get_min_band(red_array))
+print(get_max_band(red_array))
+
+
+green_array = band_stack[2].astype(np.uint16)
+blue_array = band_stack[1].astype(np.uint16)
+
+RED_CH = enhance_band(red_array, min_in= get_min_band(red_array), max_in= 20000)
+GREEN_CH = enhance_band(green_array, min_in= get_min_band(green_array), max_in= 20000)
+BLUE_CH = enhance_band(blue_array, min_in= get_min_band(blue_array), max_in= 20000)
+
+rgb = np.stack([RED_CH,GREEN_CH,BLUE_CH], axis=2) #axis =2 so its shape is (M,N,3) otherwise doesn't work with plt. (M, N, 3): an image with RGB values (0-1 float or 0-255 int)
+
+```
+
+    0
+    65535
+    6177
+    65535
+
+
+
+```python
+plt.figure(1, dpi=300)
+plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
+plt.subplot(111) ,plt.imshow(rgb[900:4900,1200:5200]),plt.title("Original image")
+plt.show()
+
+plt.figure(2, dpi=300)
+plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
+plt.subplot(121) ,plt.imshow(rgb[1500:2400,1200:2000]),plt.title("Zoom")
+plt.subplot(122) ,plt.imshow(rgb[1500:2400,3200:4000]),plt.title("Zoom")
+plt.show()
+```
+
+
+![png](Images/cirrus/output_11_0.png)
+
+
+
+![png](Images/cirrus/output_11_1.png)
+
+
 Now we will define a window:
 
 
 ```python
 # Define the window size
-windowsize_r = 50
-windowsize_c = 50
+windowsize_r = 100
+windowsize_c = 100
 
 print(cirrus[0].shape[0] - windowsize_r, cirrus[0].shape[1] - windowsize_c)
 print((cirrus[0].shape[0] - windowsize_r)/windowsize_r, (cirrus[0].shape[1] - windowsize_c)/windowsize_c)
 
 ```
 
-    1368 1529
-    27.36 30.58
+    7631 7481
+    76.31 74.81
 
-
-
-```python
-
-```
 
 
 ```python
@@ -208,11 +286,6 @@ def dehaze(Band,Cirrus):
 
 
 ```python
-
-```
-
-
-```python
 Adj_bands = []
 for band, band_name in zip(band_stack,band_ids[:7]):
     Cor_Band, coeff = dehaze(band,cirrus[0])
@@ -232,33 +305,33 @@ for band, band_name in zip(band_stack,band_ids[:7]):
     del(arch)
 ```
 
-    Correction coefficient for  B1  is:  0.948821213840654 
+    Correction coefficient for  B1  is:  1.1283407180009088 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B1.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B1.tif
     
-    Correction coefficient for  B2  is:  0.9410943874297968 
+    Correction coefficient for  B2  is:  1.0367915807207655 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B2.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B2.tif
     
-    Correction coefficient for  B3  is:  1.063660007188137 
+    Correction coefficient for  B3  is:  1.128564641830951 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B3.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B3.tif
     
-    Correction coefficient for  B4  is:  0.9352481301302594 
+    Correction coefficient for  B4  is:  1.0718697157548667 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B4.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B4.tif
     
-    Correction coefficient for  B5  is:  0.7656494268082819 
+    Correction coefficient for  B5  is:  1.3424342074419604 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B5.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B5.tif
     
-    Correction coefficient for  B6  is:  1.5702943090099126 
+    Correction coefficient for  B6  is:  2.618422350018301 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B6.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B6.tif
     
-    Correction coefficient for  B7  is:  1.5337940466128137 
+    Correction coefficient for  B7  is:  2.957719319315782 
     
-    Guardando banda: Bands/Subset/L8_L1TP_0953_20200430_DH_B7.tif
+    Guardando banda: Bands/LC08_L1TP_009053_20200430_20200430_01_RT_DH_B7.tif
     
 
 
@@ -274,6 +347,43 @@ plt.show()
 ```
 
 
-![png](Images/cirrus/output_15_0.png)
+![png](Images/cirrus/output_18_0.png)
+
+
+
+```python
+red_array_corr = Adj_bands[3].astype(np.uint16)
+green_array_corr = Adj_bands[2].astype(np.uint16)
+blue_array_corr = Adj_bands[1].astype(np.uint16)
+
+RED_CH_CORR = enhance_band(red_array_corr, min_in= get_min_band(red_array_corr), max_in= 17000)
+GREEN_CH_CORR = enhance_band(green_array_corr, min_in= get_min_band(green_array_corr), max_in= 17000)
+BLUE_CH_CORR = enhance_band(blue_array_corr, min_in= get_min_band(blue_array_corr), max_in= 17000)
+
+rgb_corr = np.stack([RED_CH_CORR,GREEN_CH_CORR,BLUE_CH_CORR], axis=2) #axis =2 so its shape is (M,N,3) otherwise doesn't work with plt. (M, N, 3): an image with RGB values (0-1 float or 0-255 int)
+
+```
+
+
+```python
+plt.figure(1, dpi=300)
+plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
+plt.subplot(111) ,plt.imshow(rgb_corr[900:4900,1200:5200]),plt.title("Corrected image")
+plt.show()
+
+plt.figure(2, dpi=300)
+plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
+plt.subplot(121) ,plt.imshow(rgb_corr[1500:2400,1200:2000]),plt.title("Zoom")
+plt.subplot(122) ,plt.imshow(rgb_corr[1500:2400,3200:4000]),plt.title("Zoom")
+plt.show()
+```
+
+
+![png](Images/cirrus/output_20_0.png)
+
+
+
+![png](Images/cirrus/output_20_1.png)
+
 
 
