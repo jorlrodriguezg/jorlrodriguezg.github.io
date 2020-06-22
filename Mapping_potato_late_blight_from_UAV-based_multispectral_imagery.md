@@ -404,7 +404,7 @@ plt.show()
 ```
 
 
-![png](output_22_0.png)
+![png](Images/mapping1/output_22_0.png)
 
 
 Training and classification of the dataset is performed by the next function:
@@ -1041,17 +1041,6 @@ print('Accuraccy: ',round(rf_acc,3),
     Accuraccy:  0.842 
     MCC:  0.714 
     Kappa:  0.685
-
-
-
-```python
-cohen_kappa_score(y_true, y_pred_rf)
-```
-
-
-
-
-    0.9068436639837699
 
 
 
