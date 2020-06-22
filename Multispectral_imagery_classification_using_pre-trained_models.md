@@ -113,10 +113,6 @@ from sklearn.svm import SVC, LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 ```
 
-    /usr/local/lib/python3.5/dist-packages/sklearn/externals/joblib/__init__.py:15: FutureWarning: sklearn.externals.joblib is deprecated in 0.21 and will be removed in 0.23. Please import this functionality directly from joblib, which can be installed with: pip install joblib. If this warning is raised when loading pickled models, you may need to re-serialize those models with scikit-learn 0.21+.
-      warnings.warn(msg, category=FutureWarning)
-
-
 
 ```python
 ds = gdal.Open('Raster/Correccion_reflectancia/MR_CE_20180526_Subachoque.tif')
@@ -493,10 +489,10 @@ class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_l
 ```
 
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    3.3s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   13.4s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   29.4s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   32.8s finished
+    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    3.1s
+    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   12.7s
+    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   29.7s
+    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   33.2s finished
 
 
 
@@ -567,8 +563,47 @@ print('The classified data include {n} classes: {classes}'.format(n=labels_class
 
     The classified data include 2 classes: [1 2]
 
+We can now save the classification results:
 
+```python
+class_out = np.stack([rf_classification,
+                      gbc_classification,
+                      svc_classification,
+                      lsvc_classification,
+                     knn_classification],
+                     axis=2)
+
+class_names = {'Class_2018-05-26_RF.tif':0,
+              'Class_2018-05-26_GBC.tif':1,
+             'Class_2018-05-26_SVC.tif':2,
+             'Class_2018-05-26_LSVC.tif':3,
+             'Class_2018-05-26_KNN.tif':4
+             }
+dir_out = 'Resultados/Jupyter/'
+
+for class_name in class_names:
+    filename_output = dir_out + class_name
+    index = class_names[class_name]
+    x_size = ds.RasterXSize  # Raster xsize
+    y_size = ds.RasterYSize  # Raster ysize
+    driver = gdal.GetDriverByName('GTiff')
+    arch = driver.Create(filename_output,x_size,y_size,1,gdal.GDT_Float32)
+    arch.SetGeoTransform(geo_transform)
+    arch.SetProjection(srs)
+    arch.GetRasterBand(1).WriteArray(class_out[:,:,index].astype(np.float32))
+    del(arch)
+    print("Classification "+class_name+" exported")
+```
+
+    Classification Class_2018-05-26_KNN.tif exported
+    Classification Class_2018-05-26_LSVC.tif exported
+    Classification Class_2018-05-26_GBC.tif exported
+    Classification Class_2018-05-26_SVC.tif exported
+    Classification Class_2018-05-26_RF.tif exported
+
+___
 # Accuracy assessment of results
+
 
 ## Loading ground reference
 
@@ -582,25 +617,17 @@ ground_truth_array = ground_truth_array_raw*filtered_mask
 srs = ds_ground_truth.GetProjectionRef()
 geo_transform = ds_ground_truth.GetGeoTransform()
 
-cmap, norm = from_levels_and_colors([0,0.5,1,2],['white','#EA8A00','green'])
+cmap, norm = colors.from_levels_and_colors([0,0.5,1,2],['white','#EA8A00','green'])
 
 plt.figure(1, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(111) ,plt.imshow(ground_truth_array, cmap=cmap),plt.title('Ground truth')
-plt.show()
-
-plt.figure(1, dpi=300)
-plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(231) ,plt.imshow(ground_truth_array[1250:1450,1100:1300], cmap=cmap),plt.title('Ground truth Zoom')
+plt.subplot(121) ,plt.imshow(ground_truth_array, cmap=cmap),plt.title('Ground truth')
+plt.subplot(122) ,plt.imshow(ground_truth_array[1250:1450,1100:1300], cmap=cmap),plt.title('Ground truth Zoom')
 plt.show()
 ```
 
 
-![png](Images/mapping2/output_25_0.png)
-
-
-
-![png](Images/mapping2/output_25_1.png)
+![png](Images/mapping2/output_26_0.png)
 
 
 ## Ground truth details
@@ -627,14 +654,16 @@ def disease_info(array, geo_transform):
 disease_info(ground_truth_array, geo_transform)
 ```
 
-    Late blight afected area:  784.07 square meters
-    Healthy potato area:  244.97 square meters
-    Late blight vs Healthy potato area ratio:  3.2
-    Late blight area vs total area:  0.76
-    Healthy potato area vs total area:  0.24
+    Late blight afected area:  605.3 square meters
+    Healthy potato area:  337.79 square meters
+    Late blight vs Healthy potato area ratio:  1.79
+    Late blight area vs total area:  0.64
+    Healthy potato area vs total area:  0.36
 
 
-### Random forest:
+## Classification accuracy assessment
+
+Because of the orientation of the experimental plot in relation to the north, and the segmentation of the orthomosaic to separate the plants of the background, we have a big area with zero values. The classification report from scikit-learn take those zeros into account, so *global accuracy*, *macro avg* and *weighted avg* in this report, in our case, may not represent accurately the metrics for the classification of late blight affected plants and healthy potato plants.
 
 
 ```python
@@ -649,14 +678,204 @@ print(classification_report(y_true, y_pred_rf, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      1.00      1.00   3337763
-     Late blight       0.85      0.96      0.90    640538
-         Healthy       0.78      0.45      0.57    200127
+               0       1.00      0.98      0.99   3407985
+     Late blight       0.69      0.93      0.80    494491
+         Healthy       0.82      0.52      0.64    275952
     
-        accuracy                           0.97   4178428
-       macro avg       0.87      0.80      0.82   4178428
-    weighted avg       0.97      0.97      0.96   4178428
+        accuracy                           0.94   4178428
+       macro avg       0.84      0.81      0.81   4178428
+    weighted avg       0.95      0.94      0.94   4178428
     
+
+
+
+Since the scikit report takes zeros into account as a class, we must create a function that allows us to calculate thematic accuracy metrics from the confusion matrix.
+
+
+```python
+def corr_metrics(y_true, y_pred):
+    cm = confusion_matrix(y_true,y_pred)
+    lbc = cm[1]
+    hp = cm[2]
+    tp = float(lbc[1])
+    fn = float(lbc[2])
+    fp = float(hp[1])
+    tn = float(hp[2])
+    tot = tp+fp+fn+tn
+    
+    cm_c = pd.DataFrame(np.array([
+        [tp, fp, tp+fp], 
+        [fn, tn, fn+tn],
+        [tp+fn, fp+tn, tp+fp+fn+tn]
+        ]),
+        columns=['Actual - Late blight plants', 'Actual - Healthy plants', 'Total'],
+        index =['Predicted - Late blight plants','Predicted - Healthy plants', 'Total']) 
+    ### ACC
+    ACC = (tp + tn)/(tp + tn + fp + fn)
+    ### MCC
+    mcc_a = tp * tn - fp * fn
+    mcc_b = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    MCC = mcc_a / mcc_b
+    ### Kappa ###
+    ##Tp
+    
+    Pr_a_tp = (tp + tn)/tot
+    Pr_A1_tp = (tp + fp)/tot
+    Pr_B1_tp = (tp + fn)/tot
+    PrA1B1_tp = Pr_A1_tp * Pr_B1_tp
+    Pr_A2_tp = (fn + tn)/tot
+    Pr_B2_tp = (fp + tn)/tot
+    PrA2B2_tp = Pr_A2_tp * Pr_B2_tp
+    Pr_e_tp = PrA1B1_tp + PrA2B2_tp
+    
+    kappa = (Pr_a_tp - Pr_e_tp)/(1 - Pr_e_tp)
+    
+    precision_tp = tp / (tp + fp)
+    precision_tn = tn / (tn + fn)
+
+    recall_tp = tp / (tp + fn)
+    recall_tn = tn / (fp + tn)
+
+    sup_tp = tp + fn
+    sup_tn = fp + tn
+
+    F_score_tp = 2*(tp)/(2*tp + fp + fn)
+    F_score_tn = 2*(tn)/(2*tn + fp + fn)
+
+    df_table = pd.DataFrame(np.array([
+        [round(precision_tp,3), round(recall_tp,3), round(F_score_tp,3),sup_tp], 
+        [round(precision_tn,3), round(recall_tn,3), round(F_score_tn,3),sup_tn]
+        ]),
+        columns=['Precision', 'Recall', 'F1 score', 'Support'],
+        index =['Late blight plants','Healthy plants'])
+    #print('Accuraccy: ',round(ACC,2), '\nMCC: ', round(MCC,2))
+    return df_table, cm_c, ACC, MCC, kappa
+```
+
+___
+
+### Random forest:
+
+
+```python
+rf_table, cm_rf, rf_acc, rf_mcc, rf_kappa = corr_metrics(y_true, y_pred_rf)
+cm_rf
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Actual - Late blight plants</th>
+      <th>Actual - Healthy plants</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Predicted - Late blight plants</th>
+      <td>462343.0</td>
+      <td>132425.0</td>
+      <td>594768.0</td>
+    </tr>
+    <tr>
+      <th>Predicted - Healthy plants</th>
+      <td>32148.0</td>
+      <td>143527.0</td>
+      <td>175675.0</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+rf_table
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1 score</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Late blight plants</th>
+      <td>0.777</td>
+      <td>0.935</td>
+      <td>0.849</td>
+      <td>494491.0</td>
+    </tr>
+    <tr>
+      <th>Healthy plants</th>
+      <td>0.817</td>
+      <td>0.520</td>
+      <td>0.636</td>
+      <td>275952.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print('Accuraccy: ',round(rf_acc,3),
+      '\nMCC: ', round(rf_mcc,3), 
+      '\nKappa: ', round(rf_kappa,3))
+```
+
+    Accuraccy:  0.786 
+    MCC:  0.52 
+    Kappa:  0.495
 
 
 #### Disease details random forest
@@ -666,32 +885,137 @@ print(classification_report(y_true, y_pred_rf, target_names=target_names))
 disease_info(rf_classification, geo_transform)
 ```
 
-    Late blight afected area:  886.44 square meters
-    Healthy potato area:  143.5 square meters
-    Late blight vs Healthy potato area ratio:  6.18
-    Late blight area vs total area:  0.86
-    Healthy potato area vs total area:  0.14
+    Late blight afected area:  814.67 square meters
+    Healthy potato area:  215.27 square meters
+    Late blight vs Healthy potato area ratio:  3.78
+    Late blight area vs total area:  0.79
+    Healthy potato area vs total area:  0.21
 
 
+___
 ### Gradient Boost Classifier
 
 
 ```python
 y_pred_gbc = gbc_classification.ravel()
-
-print(classification_report(y_true, y_pred_gbc, target_names=target_names))
+gbc_table, gbc_cm, gbc_acc, gbc_mcc, gbc_kappa = corr_metrics(y_true, y_pred_gbc)
+gbc_cm
 ```
 
-                  precision    recall  f1-score   support
-    
-               0       1.00      1.00      1.00   3337763
-     Late blight       0.83      0.57      0.68    640538
-         Healthy       0.32      0.63      0.42    200127
-    
-        accuracy                           0.92   4178428
-       macro avg       0.72      0.74      0.70   4178428
-    weighted avg       0.94      0.92      0.92   4178428
-    
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Actual - Late blight plants</th>
+      <th>Actual - Healthy plants</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Predicted - Late blight plants</th>
+      <td>280676.0</td>
+      <td>88581.0</td>
+      <td>369257.0</td>
+    </tr>
+    <tr>
+      <th>Predicted - Healthy plants</th>
+      <td>213815.0</td>
+      <td>187371.0</td>
+      <td>401186.0</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+gbc_table
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1 score</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Late blight plants</th>
+      <td>0.760</td>
+      <td>0.568</td>
+      <td>0.650</td>
+      <td>494491.0</td>
+    </tr>
+    <tr>
+      <th>Healthy plants</th>
+      <td>0.467</td>
+      <td>0.679</td>
+      <td>0.553</td>
+      <td>275952.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print('Accuraccy: ',round(gbc_acc,3),
+      '\nMCC: ', round(gbc_mcc,3), 
+      '\nKappa: ', round(gbc_kappa,3))
+```
+
+    Accuraccy:  0.608 
+    MCC:  0.237 
+    Kappa:  0.224
 
 
 #### Disease details Gradient Boost Classifier
@@ -701,32 +1025,137 @@ print(classification_report(y_true, y_pred_gbc, target_names=target_names))
 disease_info(gbc_classification, geo_transform)
 ```
 
-    Late blight afected area:  539.84 square meters
-    Healthy potato area:  490.1 square meters
-    Late blight vs Healthy potato area ratio:  1.1
-    Late blight area vs total area:  0.52
-    Healthy potato area vs total area:  0.48
+    Late blight afected area:  519.82 square meters
+    Healthy potato area:  510.11 square meters
+    Late blight vs Healthy potato area ratio:  1.02
+    Late blight area vs total area:  0.5
+    Healthy potato area vs total area:  0.5
 
 
+___
 ### Support Vector Classifier
 
 
 ```python
 y_pred_svc = svc_classification.ravel()
-
-print(classification_report(y_true, y_pred_svc, target_names=target_names))
+svc_table, svc_cm, svc_acc, svc_mcc, svc_kappa  = corr_metrics(y_true, y_pred_svc)
+svc_cm
 ```
 
-                  precision    recall  f1-score   support
-    
-               0       1.00      1.00      1.00   3337763
-     Late blight       0.82      1.00      0.90    640538
-         Healthy       0.97      0.32      0.48    200127
-    
-        accuracy                           0.97   4178428
-       macro avg       0.93      0.77      0.79   4178428
-    weighted avg       0.97      0.97      0.96   4178428
-    
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Actual - Late blight plants</th>
+      <th>Actual - Healthy plants</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Predicted - Late blight plants</th>
+      <td>484622.0</td>
+      <td>151383.0</td>
+      <td>636005.0</td>
+    </tr>
+    <tr>
+      <th>Predicted - Healthy plants</th>
+      <td>9869.0</td>
+      <td>124569.0</td>
+      <td>134438.0</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+svc_table
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1 score</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Late blight plants</th>
+      <td>0.762</td>
+      <td>0.980</td>
+      <td>0.857</td>
+      <td>494491.0</td>
+    </tr>
+    <tr>
+      <th>Healthy plants</th>
+      <td>0.927</td>
+      <td>0.451</td>
+      <td>0.607</td>
+      <td>275952.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print('Accuraccy: ',round(svc_acc,3),
+      '\nMCC: ', round(svc_mcc,3), 
+      '\nKappa: ', round(svc_kappa,3))
+```
+
+    Accuraccy:  0.791 
+    MCC:  0.545 
+    Kappa:  0.487
 
 
 #### Disease details Support Vector Classifier
@@ -736,32 +1165,137 @@ print(classification_report(y_true, y_pred_svc, target_names=target_names))
 disease_info(svc_classification, geo_transform)
 ```
 
-    Late blight afected area:  949.28 square meters
-    Healthy potato area:  80.66 square meters
-    Late blight vs Healthy potato area ratio:  11.77
-    Late blight area vs total area:  0.92
-    Healthy potato area vs total area:  0.08
+    Late blight afected area:  865.19 square meters
+    Healthy potato area:  164.75 square meters
+    Late blight vs Healthy potato area ratio:  5.25
+    Late blight area vs total area:  0.84
+    Healthy potato area vs total area:  0.16
 
 
+___
 ### Linear Support Vector Classifier
 
 
 ```python
 y_pred_lsvc = lsvc_classification.ravel()
-
-print(classification_report(y_true, y_pred_lsvc, target_names=target_names))
+lsvc_table, lsvc_cm, lsvc_acc, lsvc_mcc, lsvc_kappa  = corr_metrics(y_true, y_pred_lsvc)
+lsvc_cm
 ```
 
-                  precision    recall  f1-score   support
-    
-               0       1.00      1.00      1.00   3337763
-     Late blight       0.83      0.99      0.90    640538
-         Healthy       0.89      0.34      0.49    200127
-    
-        accuracy                           0.97   4178428
-       macro avg       0.90      0.78      0.80   4178428
-    weighted avg       0.97      0.97      0.96   4178428
-    
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Actual - Late blight plants</th>
+      <th>Actual - Healthy plants</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Predicted - Late blight plants</th>
+      <td>477418.0</td>
+      <td>138036.0</td>
+      <td>615454.0</td>
+    </tr>
+    <tr>
+      <th>Predicted - Healthy plants</th>
+      <td>17073.0</td>
+      <td>137916.0</td>
+      <td>154989.0</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+lsvc_table
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1 score</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Late blight plants</th>
+      <td>0.776</td>
+      <td>0.965</td>
+      <td>0.86</td>
+      <td>494491.0</td>
+    </tr>
+    <tr>
+      <th>Healthy plants</th>
+      <td>0.890</td>
+      <td>0.500</td>
+      <td>0.64</td>
+      <td>275952.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print('Accuraccy: ',round(lsvc_acc,3),
+      '\nMCC: ', round(lsvc_mcc,3), 
+      '\nKappa: ', round(lsvc_kappa,3))
+```
+
+    Accuraccy:  0.799 
+    MCC:  0.556 
+    Kappa:  0.515
 
 
 #### Disease details Linear Support Vector Classifier
@@ -771,48 +1305,153 @@ print(classification_report(y_true, y_pred_lsvc, target_names=target_names))
 disease_info(lsvc_classification, geo_transform)
 ```
 
-    Late blight afected area:  934.95 square meters
-    Healthy potato area:  94.99 square meters
-    Late blight vs Healthy potato area ratio:  9.84
-    Late blight area vs total area:  0.91
-    Healthy potato area vs total area:  0.09
+    Late blight afected area:  840.22 square meters
+    Healthy potato area:  189.72 square meters
+    Late blight vs Healthy potato area ratio:  4.43
+    Late blight area vs total area:  0.82
+    Healthy potato area vs total area:  0.18
 
 
+___
 ### K Neighbors Classifier
 
 
 ```python
 y_pred_knn = knn_classification.ravel()
-
-print(classification_report(y_true, y_pred_knn, target_names=target_names))
+knn_table, knn_cm, knn_acc, knn_mcc, knn_kappa  = corr_metrics(y_true, y_pred_knn)
+knn_cm
 ```
 
-                  precision    recall  f1-score   support
-    
-               0       1.00      1.00      1.00   3337763
-     Late blight       0.85      0.90      0.87    640538
-         Healthy       0.60      0.49      0.54    200127
-    
-        accuracy                           0.96   4178428
-       macro avg       0.82      0.80      0.81   4178428
-    weighted avg       0.96      0.96      0.96   4178428
-    
 
 
-### Disease details K-Neighbors Classifier
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Actual - Late blight plants</th>
+      <th>Actual - Healthy plants</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Predicted - Late blight plants</th>
+      <td>416136.0</td>
+      <td>121061.0</td>
+      <td>537197.0</td>
+    </tr>
+    <tr>
+      <th>Predicted - Healthy plants</th>
+      <td>78355.0</td>
+      <td>154891.0</td>
+      <td>233246.0</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+knn_table
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1 score</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Late blight plants</th>
+      <td>0.775</td>
+      <td>0.842</td>
+      <td>0.807</td>
+      <td>494491.0</td>
+    </tr>
+    <tr>
+      <th>Healthy plants</th>
+      <td>0.664</td>
+      <td>0.561</td>
+      <td>0.608</td>
+      <td>275952.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print('Accuraccy: ',round(knn_acc,3),
+      '\nMCC: ', round(knn_mcc,3), 
+      '\nKappa LB: ', round(knn_kappa,3))
+```
+
+    Accuraccy:  0.741 
+    MCC:  0.42 
+    Kappa LB:  0.417
+
+
+#### Disease details K-Neighbors Classifier
 
 
 ```python
 disease_info(knn_classification, geo_transform)
 ```
 
-    Late blight afected area:  828.52 square meters
-    Healthy potato area:  201.42 square meters
-    Late blight vs Healthy potato area ratio:  4.11
-    Late blight area vs total area:  0.8
-    Healthy potato area vs total area:  0.2
+    Late blight afected area:  743.04 square meters
+    Healthy potato area:  286.9 square meters
+    Late blight vs Healthy potato area ratio:  2.59
+    Late blight area vs total area:  0.72
+    Healthy potato area vs total area:  0.28
 
-
+___
 # References
 
 Glasbey, C.A., 1993.  An Analysis of Histogram-Based Thresholding Algorithms.
