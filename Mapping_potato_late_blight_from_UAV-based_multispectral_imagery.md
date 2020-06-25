@@ -1,5 +1,5 @@
 <p style="font-size:300%; color:#04B45F; text-align:center;line-height : 80px; margin : 0; padding : 0;">
-Mapping potato late blight from UAV-based multispectral imagery</p>
+Field assessment of potato late blight from UAV-based multispectral imagery</p>
 
 <p style="font-size:250%; color:#006EEA; text-align:center;line-height : 80px; margin : 0; padding : 0;">
 Part 1</p>
