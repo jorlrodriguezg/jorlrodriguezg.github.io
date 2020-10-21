@@ -1459,3 +1459,7 @@ Glasbey, C.A., 1993.  An Analysis of Histogram-Based Thresholding Algorithms.
 Otsu, N., 1979. A Threshold Selection Method from Gray-Level Histograms. IEEE transactions on systems, man, and cybernetics 9, 62–66.arXiv:1011.1669v3.
 
 Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011
+
+# Aknowlegments
+
+We greatly acknowledge funding from National Geographic and Microsoft (‘AI for Earth’).
