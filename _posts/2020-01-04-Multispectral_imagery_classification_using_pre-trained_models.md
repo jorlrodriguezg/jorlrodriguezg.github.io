@@ -1,20 +1,19 @@
-<p style="font-size:300%; color:#04B45F; text-align:center;line-height : 80px; margin : 0; padding : 0;">
-Field assessment of potato late blight from UAV-based multispectral imagery</p>
+---
+layout: post
+title: "Potato Late Blight – Part 2"
+date: 2020-01-04
+permalink: Multispectral_imagery_classification_using_pre-trained_models
+---
+<p>Field assessment of potato late blight from UAV-based multispectral imagery</p>
 
-<p style="font-size:250%; color:#006EEA; text-align:center;line-height : 80px; margin : 0; padding : 0;">
-Part 1</p>
+<p>Part 2</p>
 
-Jorge Luis Rodríguez
-
-email: jorodriguezga@unal.edu.co
-
-# Guide 1 of 2 
+# Guide 2 of 2 
 
 ## Introduction
 
-This work proposes a method to process high resolution multispectral images for detection and mapping late blight in potato crops.
-It is based on three main aspects: (i) morphological operations for background removing;
-(ii) model trainig and supervised classification stage using a random forest classifier; and (iii) use of trained models in the classification of a different dataset.
+The first tutorial allowed us to train 5 models for classification: Random forest, Gradient Boost Classifier, Support Vector Classifier, Linear Support Vector Classifier, and K-Nearest Neighbours. 
+Now we are going to use those models to classify a new dataset: May 26, 2018. Multispectral images of this dataset were acquired when late blight disease affected most of the potato crop.
 
 # Data and methods
 
@@ -23,7 +22,6 @@ The study area is a 1920 sq.m. potato field located in Subachoque, Colombia (see
 The generated mosaic covered an area of 3.2 Ha, which include the experimental plot and a bigger area where a different variety of potato was located, being this variety
 a yellow potato, this means, the tuber root colour it produces is yellow. In contrast, the potato from the experimental plot was from one variety of white potato (*Diacol capiro*).
 The experimental plot area was clipped by using a reference polygon (red polygon).
-
 
 ## Study area:
 
@@ -87,12 +85,6 @@ of the field with an area of 216 sq.m., the space between rows was 1m. Each row 
 The layout of the experimental crop. The yellow lines indicate the division of the field into 18 experimental blocks. (a) May 12, 2018; (b) May 26, 2018.
 
 
-## Background removing
-
-### Multispectral image load
-
-
-
 
 ```python
 %matplotlib inline
@@ -114,7 +106,7 @@ import skimage.io as io
   
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.externals import joblib
-from sklearn.metrics import plot_roc_curve, classification_report, multilabel_confusion_matrix
+from sklearn.metrics import plot_roc_curve, classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 
 from sklearn.svm import SVC, LinearSVC
@@ -122,9 +114,8 @@ from sklearn.neighbors import KNeighborsClassifier
 ```
 
 
-
 ```python
-ds = gdal.Open('Raster/Correccion_reflectancia/MR_CE_20180512_Subachoque.tif')
+ds = gdal.Open('Raster/Correccion_reflectancia/MR_CE_20180526_Subachoque.tif')
 ```
 
 
@@ -150,7 +141,7 @@ plt.show()
 ```
 
 
-![png](Images/mapping1/output_7_0.png)
+![png](Images/mapping2/output_4_0.png)
 
 
 ### Thresholding
@@ -182,22 +173,23 @@ plt.subplot(235), plt.bar(hist_range,hist_b5,0.01),plt.title('Near infrared')
 
 
 
-    (<matplotlib.axes._subplots.AxesSubplot at 0x7f99b2446390>,
+    (<matplotlib.axes._subplots.AxesSubplot at 0x7f2c0809df98>,
      <Container object of 100 artists>,
-     <matplotlib.text.Text at 0x7f99bdcb04a8>)
+     <matplotlib.text.Text at 0x7f2c0e8f4ef0>)
 
 
 
 
-![png](Images/mapping1/output_9_1.png)
+![png](Images/mapping2/output_6_1.png)
 
 
 
 ```python
-image=NIR
+image=REDEDGE
 hist_image = image.ravel()
 hist = np.histogram(image[image!=0].ravel(),100,[0,1])[0]
 thresh = threshold_otsu(image)
+thresh = thresh + 0.03
 binary = image > thresh
 
 plt.figure(1, dpi=300)
@@ -210,7 +202,7 @@ plt.show()
 ```
 
 
-![png](Images/mapping1/output_10_0.png)
+![png](Images/mapping2/output_7_0.png)
 
 
 ### Masking image
@@ -239,7 +231,7 @@ plt.show()
 ```
 
 
-![png](Images/mapping1/output_12_0.png)
+![png](Images/mapping2/output_9_0.png)
 
 
 Here we can see how looks any band from the multispectral image after masking process. It can be seen how the ground surface does not appear any more.
@@ -263,7 +255,7 @@ plt.show()
 ```
 
 
-![png](Images/mapping1/output_14_0.png)
+![png](Images/mapping2/output_11_0.png)
 
 
 We can now create a false colour composition to improve the visualization of the background removing step. This was performed for visualisation purposes only:
@@ -281,8 +273,8 @@ def enhance_band(band, min_in= 0.1, max_in= 0.2):
 
 
 ```python
-NIR_IN = enhance_band(NIR, min_in= 0.0, max_in= (NIR.max()-0.12))
-ROJO_IN = enhance_band(ROJO, min_in= 0.0, max_in= (ROJO.max()-0.06))
+NIR_IN = enhance_band(NIR, min_in= 0.0, max_in= (NIR.max()-0.10))
+ROJO_IN = enhance_band(ROJO, min_in= 0.0, max_in= (ROJO.max()-0.08))
 VERDE_IN = enhance_band(VERDE, min_in= 0.0, max_in= VERDE.max())
 
 rgb = np.stack([NIR_IN,ROJO_IN,VERDE_IN], axis=2) #axis =2 so its shape is (M,N,3) otherwise doesn't work with plt. (M, N, 3): an image with RGB values (0-1 float or 0-255 int)
@@ -297,17 +289,17 @@ plt.show()
 
 plt.figure(2, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(121) ,plt.imshow(rgb[1450:1700,1100:1300]),plt.title("Original image")
-plt.subplot(122) ,plt.imshow(plantsImage[1450:1700,1100:1300]),plt.title("Masked image")
+plt.subplot(121) ,plt.imshow(rgb[1250:1450,1100:1300]),plt.title("Original image")
+plt.subplot(122) ,plt.imshow(plantsImage[1250:1450,1100:1300]),plt.title("Masked image")
 plt.show()
 ```
 
 
-![png](Images/mapping1/output_17_0.png)
+![png](Images/mapping2/output_14_0.png)
 
 
 
-![png](Images/mapping1/output_17_1.png)
+![png](Images/mapping2/output_14_1.png)
 
 
 ### Segmented bands to files
@@ -320,14 +312,14 @@ bands_out = np.stack([azul_seg,
                       verde_seg,
                       rojo_seg,
                       rededge_seg,
-                     nir_seg],
+                      nir_seg],
                      axis=2)
 
-band_names = {'M_2018-05-12_Corte_Seg_B1.tif':0,
-              'M_2018-05-12_Corte_Seg_B2.tif':1,
-             'M_2018-05-12_Corte_Seg_B3.tif':2,
-             'M_2018-05-12_Corte_Seg_B4.tif':3,
-             'M_2018-05-12_Corte_Seg_B5.tif':4
+band_names = {'M_2018-05-26_Corte_Seg_B1.tif':0,
+              'M_2018-05-26_Corte_Seg_B2.tif':1,
+             'M_2018-05-26_Corte_Seg_B3.tif':2,
+             'M_2018-05-26_Corte_Seg_B4.tif':3,
+             'M_2018-05-26_Corte_Seg_B5.tif':4
              }
 dir_out = 'Raster/Segmented/'
 
@@ -343,36 +335,33 @@ for band_name in band_names:
     arch.GetRasterBand(1).WriteArray(bands_out[:,:,index].astype(np.float32))
     del(arch)
     print("Band "+band_name+" exported")
+    
 ```
 
-    Band M_2018-05-12_Corte_Seg_B5.tif exported
-    Band M_2018-05-12_Corte_Seg_B4.tif exported
-    Band M_2018-05-12_Corte_Seg_B1.tif exported
-    Band M_2018-05-12_Corte_Seg_B3.tif exported
-    Band M_2018-05-12_Corte_Seg_B2.tif exported
+    Band M_2018-05-26_Corte_Seg_B4.tif exported
+    Band M_2018-05-26_Corte_Seg_B2.tif exported
+    Band M_2018-05-26_Corte_Seg_B1.tif exported
+    Band M_2018-05-26_Corte_Seg_B3.tif exported
+    Band M_2018-05-26_Corte_Seg_B5.tif exported
 
 
-## Supervised classification of dataset (a) May 12, 2018, and models training
+## Classification of dataset: May 26, 2018
 
 ### Loading segmented bands
 
 
 ```python
 rootdir = "Raster/Segmented"
-# path to your training data
-path_pix = "Entrenamiento/"
 # path to your model
 path_model = "Data/Models/"
 # path to your classification results
 path_class = "Data/Class/"
 
-samples = path_pix + "Training_input.tif"
-
-ds_seg1 = gdal.Open('Raster/Segmented/M_2018-05-12_Corte_Seg_B1.tif')
-ds_seg2 = gdal.Open('Raster/Segmented/M_2018-05-12_Corte_Seg_B2.tif')
-ds_seg3 = gdal.Open('Raster/Segmented/M_2018-05-12_Corte_Seg_B3.tif')
-ds_seg4 = gdal.Open('Raster/Segmented/M_2018-05-12_Corte_Seg_B4.tif')
-ds_seg5 = gdal.Open('Raster/Segmented/M_2018-05-12_Corte_Seg_B5.tif')
+ds_seg1 = gdal.Open('Raster/Segmented/M_2018-05-26_Corte_Seg_B1.tif')
+ds_seg2 = gdal.Open('Raster/Segmented/M_2018-05-26_Corte_Seg_B2.tif')
+ds_seg3 = gdal.Open('Raster/Segmented/M_2018-05-26_Corte_Seg_B3.tif')
+ds_seg4 = gdal.Open('Raster/Segmented/M_2018-05-26_Corte_Seg_B4.tif')
+ds_seg5 = gdal.Open('Raster/Segmented/M_2018-05-26_Corte_Seg_B5.tif')
 
 Segmented_image = np.stack([ds_seg1.GetRasterBand(1).ReadAsArray(),
                            ds_seg2.GetRasterBand(1).ReadAsArray(),
@@ -380,34 +369,6 @@ Segmented_image = np.stack([ds_seg1.GetRasterBand(1).ReadAsArray(),
                            ds_seg4.GetRasterBand(1).ReadAsArray(),
                            ds_seg5.GetRasterBand(1).ReadAsArray()], axis=2)
 ```
-
-Training samples can be seen below:
-
-
-```python
-samples_ds = gdal.Open(samples)
-
-samples_array = samples_ds.GetRasterBand(1).ReadAsArray()
-samples_array_im = samples_array * filtered_mask
-red_ch= enhance_band(ROJO, min_in= 0.0, max_in= (NIR.max()-0.12))
-green_ch = enhance_band(VERDE, min_in= 0.0, max_in= (ROJO.max()-0.06))
-blue_ch = enhance_band(AZUL, min_in= 0.0, max_in= VERDE.max())
-
-rgb_natural_color = np.stack([red_ch,green_ch,blue_ch], axis=2)
-
-cmap, norm = colors.from_levels_and_colors([0,0.9,1,2],['white','#EA0000','#001FFF'])
-
-plt.figure(1, dpi=300)
-plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(111) ,plt.imshow(rgb_natural_color),plt.imshow(samples_array, cmap=cmap, alpha=0.4),plt.title('Training samples')
-plt.show()
-```
-
-
-![png](Images/mapping1/output_22_0.png)
-
-
-Training and classification of the dataset is performed by the next function:
 
 
 ```python
@@ -428,46 +389,14 @@ def plot_time(dt):
     plt.show()
 
 # declare a new function
-def training(img_ds, samples, path_pix, path_model, path_class):
+def training(img_ds, path_model, path_class):
 
     img = img_ds.copy()
-
-    # Load trainig classes 
-    roi_ds = io.imread(samples)   
-    roi = np.array(roi_ds, dtype='int8')  
-    
-    # read in your labels
-    labels = np.unique(roi[roi > 0]) 
-    print('The training data include {n} classes: {classes}'.format(n=labels.size, classes=labels))
-
-    # compose your X,Y data (dataset - training data)     
-    X = img[roi > 0, :] 
-    Y = roi[roi > 0] 
-    
-    # Split dataset into trainig an test
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42)
-
-    # assign class weights (class 1 has the weight 3, etc.)
-    #weights = {1:3, 2:2, 3:2, 4:2}
-    weights = None
-    #weights = "balanced_subsample"
     
     ################### Random Forest Classifier ##########################
     # build your Random Forest Classifier 
     # for more information: http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
     ti_rf = time.time()
-    rf = RandomForestClassifier(class_weight = weights, n_estimators = 500, criterion = 'gini', max_depth = 4, 
-                                min_samples_split = 2, min_samples_leaf = 2, max_features = 'auto', 
-                                bootstrap = True, oob_score = True, n_jobs = 2, random_state = None, verbose = True)  
-    
-    
-    # now fit your training data with the original dataset
-    rf = rf.fit(X_train,Y_train)
-
-    # Save your Random Forest Model     
-    model = path_model + "model_RF.pkl"
-    joblib.dump(rf, model)   
-
     # call your random forest model
     rf = path_model + "model_RF.pkl"          
     clf = joblib.load(rf)    
@@ -485,16 +414,6 @@ def training(img_ds, samples, path_pix, path_model, path_class):
     # alternatively you may try out a Gradient Boosting Classifier 
     # It is much less RAM consuming and considers weak training data      
     ti_gbc = time.time()
-    GBC = GradientBoostingClassifier(n_estimators = 500, min_samples_leaf = 1, min_samples_split = 4, max_depth = 4,    
-                                    max_features = 'auto', learning_rate = 0.8, subsample = 1, random_state = None,         
-                                    warm_start = True)
-    
-    # now fit your training data with the original dataset
-    GBC = GBC.fit(X_train,Y_train)
-
-    # Save your Gradient Boosting Model     
-    model_GBC = path_model + "model_GBC.pkl"
-    joblib.dump(GBC, model_GBC)
 
     GBC = path_model + "model_GBC.pkl"          
     clf_GBC = joblib.load(GBC)    
@@ -510,15 +429,7 @@ def training(img_ds, samples, path_pix, path_model, path_class):
         
     #########################Support Vector Classifier#############################    
     ti_svc = time.time()
-    svc = SVC(random_state = None, gamma = 'auto')
     
-    # now fit your training data with the original dataset
-    svc = svc.fit(X_train,Y_train)
-
-    # export your SVC model     
-    model_svc = path_model + "model_svc.pkl"
-    joblib.dump(svc, model_svc)
-
     # call your SVC model
     svc = path_model + "model_svc.pkl"          
     clf_svc = joblib.load(svc)    
@@ -533,14 +444,6 @@ def training(img_ds, samples, path_pix, path_model, path_class):
     dt_svc = tf_svc - ti_svc
     #########################Linear Support Vector Classifier#############################   
     ti_lsvc = time.time()
-    lsvc = LinearSVC()
-    
-    # now fit your training data with the original dataset
-    lsvc = lsvc.fit(X_train,Y_train)
-
-    # export your Random Forest / Gradient Boosting Model     
-    model_lsvc = path_model + "model_lsvc.pkl"
-    joblib.dump(lsvc, model_lsvc)
 
     # call your Linear SVC model
     lsvc = path_model + "model_lsvc.pkl"          
@@ -557,14 +460,6 @@ def training(img_ds, samples, path_pix, path_model, path_class):
     dt_lsvc = tf_lsvc - ti_lsvc
     ######################### KNN Classifier#############################  
     ti_knn = time.time()
-    knn = KNeighborsClassifier()
-    
-    # now fit your training data with the original dataset
-    knn = knn.fit(X_train,Y_train)
-
-    # export your KNN Model     
-    model_knn = path_model + "model_knn.pkl"
-    joblib.dump(knn, model_knn)
 
     # call your KNN model
     knn = path_model + "model_knn.pkl"          
@@ -579,29 +474,7 @@ def training(img_ds, samples, path_pix, path_model, path_class):
     
     tf_knn = time.time()
     dt_knn = tf_knn - ti_knn
-    ########## Plot ROC curves ####################
-
-    plt.rcParams['figure.dpi'] = 300
-    ax = plt.gca()
-    rfc_disp = plot_roc_curve(clf,X_test,Y_test, ax=ax)
-    GBC_disp = plot_roc_curve(clf_GBC,X_test,Y_test, ax=rfc_disp.ax_)
-    svc_disp = plot_roc_curve(clf_svc,X_test,Y_test, ax=GBC_disp.ax_, alpha=0.8)
-    lsvc_disp = plot_roc_curve(clf_lsvc,X_test,Y_test, ax=svc_disp.ax_, alpha=0.8)
-    knn_disp = plot_roc_curve(clf_knn,X_test,Y_test, ax=lsvc_disp.ax_, alpha=0.8)
-    knn_disp.figure_.suptitle("ROC curve comparison")
-    plt.show()
     
-    
-    ax1 = plt.gca()
-    ax1.set(xlim=[0,0.5], ylim=[0.5,1])
-
-    rfc_disp = plot_roc_curve(clf,X_test,Y_test, ax=ax1)
-    GBC_disp = plot_roc_curve(clf_GBC,X_test,Y_test, ax=rfc_disp.ax_)
-    svc_disp = plot_roc_curve(clf_svc,X_test,Y_test, ax=GBC_disp.ax_, alpha=0.8)
-    lsvc_disp = plot_roc_curve(clf_lsvc,X_test,Y_test, ax=svc_disp.ax_, alpha=0.8)
-    knn_disp = plot_roc_curve(clf_knn,X_test,Y_test, ax=lsvc_disp.ax_, alpha=0.8)
-    knn_disp.figure_.suptitle("ROC curve comparison - ZOOM")
-    plt.show()
     
     plot_time([dt_rf, dt_gbc, dt_svc, dt_lsvc,dt_knn])
     
@@ -611,51 +484,20 @@ def training(img_ds, samples, path_pix, path_model, path_class):
 
 
 ```python
-class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_lsvc, class_prediction_knn = training(Segmented_image, samples, path_pix, path_model, path_class)
+class_prediction, class_prediction_GBC, class_prediction_svc, class_prediction_lsvc, class_prediction_knn = training(Segmented_image, path_model, path_class)
 
 ```
 
-    The training data include 2 classes: [1 2]
-
-
     [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    0.2s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:    0.7s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:    1.7s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:    1.9s finished
-    [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    4.0s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   16.9s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   38.1s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   42.8s finished
-    [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    0.0s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:    0.0s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:    0.1s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:    0.1s finished
+    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    3.1s
+    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:   12.7s
+    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:   29.7s
+    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:   33.2s finished
 
 
 
-![png](Images/mapping1/output_25_2.png)
+![png](Images/mapping2/output_20_1.png)
 
-
-    [Parallel(n_jobs=2)]: Using backend ThreadingBackend with 2 concurrent workers.
-    [Parallel(n_jobs=2)]: Done  46 tasks      | elapsed:    0.0s
-    [Parallel(n_jobs=2)]: Done 196 tasks      | elapsed:    0.0s
-    [Parallel(n_jobs=2)]: Done 446 tasks      | elapsed:    0.1s
-    [Parallel(n_jobs=2)]: Done 500 out of 500 | elapsed:    0.1s finished
-
-
-
-![png](Images/mapping1/output_25_4.png)
-
-
-
-![png](Images/mapping1/output_25_5.png)
-
-
-
-The scikit-klearn methods do not support NaN data, so we can't replace pixels with zero values by using np.nan, so when classifying, pixels with a zero value are included in one of the classes, in this case, in the late blight class. To clean the results, we use the mask created previously.
 
 
 ```python
@@ -673,7 +515,7 @@ plt.show()
 ```
 
 
-![png](Images/mapping1/output_27_0.png)
+![png](Images/mapping2/output_21_0.png)
 
 
 
@@ -686,7 +528,7 @@ svc_classification = class_prediction_svc*filtered_mask
 lsvc_classification = class_prediction_lsvc*filtered_mask
 knn_classification = class_prediction_knn*filtered_mask
 
-plt.figure(1, dpi=300)
+plt.figure(3, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
 plt.subplot(231) ,plt.imshow(rf_classification, cmap=cmap),plt.title('RFC')
 plt.subplot(232) ,plt.imshow(gbc_classification,cmap=cmap),plt.title('GBC')
@@ -697,20 +539,20 @@ plt.show()
 
 plt.figure(1, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(231) ,plt.imshow(rf_classification[1400:1700,1200:1400], cmap=cmap),plt.title('RFC Zoom')
-plt.subplot(232) ,plt.imshow(gbc_classification[1400:1700,1200:1400],cmap=cmap),plt.title('GBC  Zoom')
-plt.subplot(233) ,plt.imshow(svc_classification[1400:1700,1200:1400],cmap=cmap),plt.title('SVC  Zoom')
-plt.subplot(234) ,plt.imshow(lsvc_classification[1400:1700,1200:1400],cmap=cmap),plt.title('LSVC  Zoom')
-plt.subplot(235) ,plt.imshow(knn_classification[1400:1700,1200:1400],cmap=cmap),plt.title('KNN  Zoom')
+plt.subplot(231) ,plt.imshow(rf_classification[1250:1450,1100:1300], cmap=cmap),plt.title('RFC Zoom')
+plt.subplot(232) ,plt.imshow(gbc_classification[1250:1450,1100:1300],cmap=cmap),plt.title('GBC  Zoom')
+plt.subplot(233) ,plt.imshow(svc_classification[1250:1450,1100:1300],cmap=cmap),plt.title('SVC  Zoom')
+plt.subplot(234) ,plt.imshow(lsvc_classification[1250:1450,1100:1300],cmap=cmap),plt.title('LSVC  Zoom')
+plt.subplot(235) ,plt.imshow(knn_classification[1250:1450,1100:1300],cmap=cmap),plt.title('KNN  Zoom')
 plt.show()
 ```
 
 
-![png](Images/mapping1/output_28_0.png)
+![png](Images/mapping2/output_22_0.png)
 
 
 
-![png](Images/mapping1/output_28_1.png)
+![png](Images/mapping2/output_22_1.png)
 
 
 
@@ -721,6 +563,7 @@ print('The classified data include {n} classes: {classes}'.format(n=labels_class
 
     The classified data include 2 classes: [1 2]
 
+We can now save the classification results:
 
 ```python
 class_out = np.stack([rf_classification,
@@ -730,11 +573,11 @@ class_out = np.stack([rf_classification,
                      knn_classification],
                      axis=2)
 
-class_names = {'Class_2018-05-12_RF.tif':0,
-              'Class_2018-05-12_GBC.tif':1,
-             'Class_2018-05-12_SVC.tif':2,
-             'Class_2018-05-12_LSVC.tif':3,
-             'Class_2018-05-12_KNN.tif':4
+class_names = {'Class_2018-05-26_RF.tif':0,
+              'Class_2018-05-26_GBC.tif':1,
+             'Class_2018-05-26_SVC.tif':2,
+             'Class_2018-05-26_LSVC.tif':3,
+             'Class_2018-05-26_KNN.tif':4
              }
 dir_out = 'Resultados/Jupyter/'
 
@@ -752,20 +595,21 @@ for class_name in class_names:
     print("Classification "+class_name+" exported")
 ```
 
-    Classification Class_2018-05-12_KNN.tif exported
-    Classification Class_2018-05-12_LSVC.tif exported
-    Classification Class_2018-05-12_SVC.tif exported
-    Classification Class_2018-05-12_RF.tif exported
-    Classification Class_2018-05-12_GBC.tif exported
+    Classification Class_2018-05-26_KNN.tif exported
+    Classification Class_2018-05-26_LSVC.tif exported
+    Classification Class_2018-05-26_GBC.tif exported
+    Classification Class_2018-05-26_SVC.tif exported
+    Classification Class_2018-05-26_RF.tif exported
 
-
+___
 # Accuracy assessment of results
+
 
 ## Loading ground reference
 
 
 ```python
-ds_ground_truth = gdal.Open('Validacion/Raster/Ground_truth_2018-05-12-ML.tif')
+ds_ground_truth = gdal.Open('Validacion/Raster/Ground_truth_2018-05-26.tif')
 
 # asignacion cada banda 
 ground_truth_array_raw = ds_ground_truth.GetRasterBand(1).ReadAsArray()
@@ -773,24 +617,20 @@ ground_truth_array = ground_truth_array_raw*filtered_mask
 srs = ds_ground_truth.GetProjectionRef()
 geo_transform = ds_ground_truth.GetGeoTransform()
 
-cmap, norm = from_levels_and_colors([0,0.5,1,2],['white','#EA8A00','green'])
+cmap, norm = colors.from_levels_and_colors([0,0.5,1,2],['white','#EA8A00','green'])
 
 plt.figure(1, dpi=300)
 plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(111) ,plt.imshow(ground_truth_array, cmap=cmap),plt.title('Ground truth')
-plt.show()
-
-plt.figure(1, dpi=300)
-plt.subplots_adjust(left=0.0, right=3.0, bottom=0.0, top=3.0)
-plt.subplot(111) ,plt.imshow(ground_truth_array[1400:1700,1200:1400], cmap=cmap),plt.title('Ground truth Zoom')
+plt.subplot(121) ,plt.imshow(ground_truth_array, cmap=cmap),plt.title('Ground truth')
+plt.subplot(122) ,plt.imshow(ground_truth_array[1250:1450,1100:1300], cmap=cmap),plt.title('Ground truth Zoom')
 plt.show()
 ```
 
 
-![png](Images/mapping1/output_32_0.png)
+![png](Images/mapping2/output_26_0.png)
 
 
-### Ground truth details
+## Ground truth details
 
 
 ```python
@@ -814,14 +654,12 @@ def disease_info(array, geo_transform):
 disease_info(ground_truth_array, geo_transform)
 ```
 
-    Late blight afected area:  504.87 square meters
-    Healthy potato area:  527.16 square meters
-    Late blight vs Healthy potato area ratio:  0.96
-    Late blight area vs total area:  0.49
-    Healthy potato area vs total area:  0.51
+    Late blight afected area:  605.3 square meters
+    Healthy potato area:  337.79 square meters
+    Late blight vs Healthy potato area ratio:  1.79
+    Late blight area vs total area:  0.64
+    Healthy potato area vs total area:  0.36
 
-
-____
 
 ## Classification accuracy assessment
 
@@ -840,14 +678,15 @@ print(classification_report(y_true, y_pred_rf, target_names=target_names))
 
                   precision    recall  f1-score   support
     
-               0       1.00      1.00      1.00   3984453
-     Late blight       0.76      0.98      0.86    492883
-         Healthy       0.98      0.71      0.82    514640
+               0       1.00      0.98      0.99   3407985
+     Late blight       0.69      0.93      0.80    494491
+         Healthy       0.82      0.52      0.64    275952
     
-        accuracy                           0.97   4991976
-       macro avg       0.91      0.90      0.89   4991976
-    weighted avg       0.97      0.97      0.97   4991976
+        accuracy                           0.94   4178428
+       macro avg       0.84      0.81      0.81   4178428
+    weighted avg       0.95      0.94      0.94   4178428
     
+
 
 
 Since the scikit report takes zeros into account as a class, we must create a function that allows us to calculate thematic accuracy metrics from the confusion matrix.
@@ -890,11 +729,7 @@ def corr_metrics(y_true, y_pred):
     Pr_e_tp = PrA1B1_tp + PrA2B2_tp
     
     kappa = (Pr_a_tp - Pr_e_tp)/(1 - Pr_e_tp)
-    """
-    kappa_tp = (2 * tp)/(tot + tp - tn)
- 
-    kappa_tn = (2 * tn)/(tot + tn - tp)
-    """
+    
     precision_tp = tp / (tp + fp)
     precision_tn = tn / (tn + fn)
 
@@ -923,7 +758,7 @@ ___
 
 
 ```python
-rf_table, cm_rf, rf_acc, rf_mcc, rf_kappa= corr_metrics(y_true, y_pred_rf)
+rf_table, cm_rf, rf_acc, rf_mcc, rf_kappa = corr_metrics(y_true, y_pred_rf)
 cm_rf
 ```
 
@@ -956,21 +791,21 @@ cm_rf
   <tbody>
     <tr>
       <th>Predicted - Late blight plants</th>
-      <td>484246.0</td>
-      <td>150716.0</td>
-      <td>634962.0</td>
+      <td>462343.0</td>
+      <td>132425.0</td>
+      <td>594768.0</td>
     </tr>
     <tr>
       <th>Predicted - Healthy plants</th>
-      <td>8637.0</td>
-      <td>363924.0</td>
-      <td>372561.0</td>
+      <td>32148.0</td>
+      <td>143527.0</td>
+      <td>175675.0</td>
     </tr>
     <tr>
       <th>Total</th>
-      <td>492883.0</td>
-      <td>514640.0</td>
-      <td>1007523.0</td>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
     </tr>
   </tbody>
 </table>
@@ -1013,17 +848,17 @@ rf_table
   <tbody>
     <tr>
       <th>Late blight plants</th>
-      <td>0.763</td>
-      <td>0.982</td>
-      <td>0.859</td>
-      <td>492883.0</td>
+      <td>0.777</td>
+      <td>0.935</td>
+      <td>0.849</td>
+      <td>494491.0</td>
     </tr>
     <tr>
       <th>Healthy plants</th>
-      <td>0.977</td>
-      <td>0.707</td>
-      <td>0.820</td>
-      <td>514640.0</td>
+      <td>0.817</td>
+      <td>0.520</td>
+      <td>0.636</td>
+      <td>275952.0</td>
     </tr>
   </tbody>
 </table>
@@ -1038,28 +873,26 @@ print('Accuraccy: ',round(rf_acc,3),
       '\nKappa: ', round(rf_kappa,3))
 ```
 
-    Accuraccy:  0.842 
-    MCC:  0.714 
-    Kappa:  0.685
+    Accuraccy:  0.786 
+    MCC:  0.52 
+    Kappa:  0.495
 
 
-
-#### Disease details of Random forest
+#### Disease details random forest
 
 
 ```python
 disease_info(rf_classification, geo_transform)
 ```
 
-    Late blight afected area:  650.4 square meters
-    Healthy potato area:  381.62 square meters
-    Late blight vs Healthy potato area ratio:  1.7
-    Late blight area vs total area:  0.63
-    Healthy potato area vs total area:  0.37
+    Late blight afected area:  814.67 square meters
+    Healthy potato area:  215.27 square meters
+    Late blight vs Healthy potato area ratio:  3.78
+    Late blight area vs total area:  0.79
+    Healthy potato area vs total area:  0.21
 
 
 ___
-
 ### Gradient Boost Classifier
 
 
@@ -1098,21 +931,21 @@ gbc_cm
   <tbody>
     <tr>
       <th>Predicted - Late blight plants</th>
-      <td>441354.0</td>
-      <td>173013.0</td>
-      <td>614367.0</td>
+      <td>280676.0</td>
+      <td>88581.0</td>
+      <td>369257.0</td>
     </tr>
     <tr>
       <th>Predicted - Healthy plants</th>
-      <td>51529.0</td>
-      <td>341627.0</td>
-      <td>393156.0</td>
+      <td>213815.0</td>
+      <td>187371.0</td>
+      <td>401186.0</td>
     </tr>
     <tr>
       <th>Total</th>
-      <td>492883.0</td>
-      <td>514640.0</td>
-      <td>1007523.0</td>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
     </tr>
   </tbody>
 </table>
@@ -1155,17 +988,17 @@ gbc_table
   <tbody>
     <tr>
       <th>Late blight plants</th>
-      <td>0.718</td>
-      <td>0.895</td>
-      <td>0.797</td>
-      <td>492883.0</td>
+      <td>0.760</td>
+      <td>0.568</td>
+      <td>0.650</td>
+      <td>494491.0</td>
     </tr>
     <tr>
       <th>Healthy plants</th>
-      <td>0.869</td>
-      <td>0.664</td>
-      <td>0.753</td>
-      <td>514640.0</td>
+      <td>0.467</td>
+      <td>0.679</td>
+      <td>0.553</td>
+      <td>275952.0</td>
     </tr>
   </tbody>
 </table>
@@ -1180,9 +1013,9 @@ print('Accuraccy: ',round(gbc_acc,3),
       '\nKappa: ', round(gbc_kappa,3))
 ```
 
-    Accuraccy:  0.777 
-    MCC:  0.573 
-    Kappa:  0.556
+    Accuraccy:  0.608 
+    MCC:  0.237 
+    Kappa:  0.224
 
 
 #### Disease details Gradient Boost Classifier
@@ -1192,15 +1025,14 @@ print('Accuraccy: ',round(gbc_acc,3),
 disease_info(gbc_classification, geo_transform)
 ```
 
-    Late blight afected area:  629.31 square meters
-    Healthy potato area:  402.72 square meters
-    Late blight vs Healthy potato area ratio:  1.56
-    Late blight area vs total area:  0.61
-    Healthy potato area vs total area:  0.39
+    Late blight afected area:  519.82 square meters
+    Healthy potato area:  510.11 square meters
+    Late blight vs Healthy potato area ratio:  1.02
+    Late blight area vs total area:  0.5
+    Healthy potato area vs total area:  0.5
 
 
 ___
-
 ### Support Vector Classifier
 
 
@@ -1239,21 +1071,21 @@ svc_cm
   <tbody>
     <tr>
       <th>Predicted - Late blight plants</th>
-      <td>482402.0</td>
-      <td>121112.0</td>
-      <td>603514.0</td>
+      <td>484622.0</td>
+      <td>151383.0</td>
+      <td>636005.0</td>
     </tr>
     <tr>
       <th>Predicted - Healthy plants</th>
-      <td>10481.0</td>
-      <td>393528.0</td>
-      <td>404009.0</td>
+      <td>9869.0</td>
+      <td>124569.0</td>
+      <td>134438.0</td>
     </tr>
     <tr>
       <th>Total</th>
-      <td>492883.0</td>
-      <td>514640.0</td>
-      <td>1007523.0</td>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
     </tr>
   </tbody>
 </table>
@@ -1296,17 +1128,17 @@ svc_table
   <tbody>
     <tr>
       <th>Late blight plants</th>
-      <td>0.799</td>
-      <td>0.979</td>
-      <td>0.880</td>
-      <td>492883.0</td>
+      <td>0.762</td>
+      <td>0.980</td>
+      <td>0.857</td>
+      <td>494491.0</td>
     </tr>
     <tr>
       <th>Healthy plants</th>
-      <td>0.974</td>
-      <td>0.765</td>
-      <td>0.857</td>
-      <td>514640.0</td>
+      <td>0.927</td>
+      <td>0.451</td>
+      <td>0.607</td>
+      <td>275952.0</td>
     </tr>
   </tbody>
 </table>
@@ -1321,9 +1153,9 @@ print('Accuraccy: ',round(svc_acc,3),
       '\nKappa: ', round(svc_kappa,3))
 ```
 
-    Accuraccy:  0.869 
-    MCC:  0.758 
-    Kappa:  0.74
+    Accuraccy:  0.791 
+    MCC:  0.545 
+    Kappa:  0.487
 
 
 #### Disease details Support Vector Classifier
@@ -1333,15 +1165,14 @@ print('Accuraccy: ',round(svc_acc,3),
 disease_info(svc_classification, geo_transform)
 ```
 
-    Late blight afected area:  618.19 square meters
-    Healthy potato area:  413.83 square meters
-    Late blight vs Healthy potato area ratio:  1.49
-    Late blight area vs total area:  0.6
-    Healthy potato area vs total area:  0.4
+    Late blight afected area:  865.19 square meters
+    Healthy potato area:  164.75 square meters
+    Late blight vs Healthy potato area ratio:  5.25
+    Late blight area vs total area:  0.84
+    Healthy potato area vs total area:  0.16
 
 
 ___
-
 ### Linear Support Vector Classifier
 
 
@@ -1380,21 +1211,21 @@ lsvc_cm
   <tbody>
     <tr>
       <th>Predicted - Late blight plants</th>
-      <td>483526.0</td>
-      <td>117071.0</td>
-      <td>600597.0</td>
+      <td>477418.0</td>
+      <td>138036.0</td>
+      <td>615454.0</td>
     </tr>
     <tr>
       <th>Predicted - Healthy plants</th>
-      <td>9357.0</td>
-      <td>397569.0</td>
-      <td>406926.0</td>
+      <td>17073.0</td>
+      <td>137916.0</td>
+      <td>154989.0</td>
     </tr>
     <tr>
       <th>Total</th>
-      <td>492883.0</td>
-      <td>514640.0</td>
-      <td>1007523.0</td>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
     </tr>
   </tbody>
 </table>
@@ -1437,17 +1268,17 @@ lsvc_table
   <tbody>
     <tr>
       <th>Late blight plants</th>
-      <td>0.805</td>
-      <td>0.981</td>
-      <td>0.884</td>
-      <td>492883.0</td>
+      <td>0.776</td>
+      <td>0.965</td>
+      <td>0.86</td>
+      <td>494491.0</td>
     </tr>
     <tr>
       <th>Healthy plants</th>
-      <td>0.977</td>
-      <td>0.773</td>
-      <td>0.863</td>
-      <td>514640.0</td>
+      <td>0.890</td>
+      <td>0.500</td>
+      <td>0.64</td>
+      <td>275952.0</td>
     </tr>
   </tbody>
 </table>
@@ -1462,9 +1293,9 @@ print('Accuraccy: ',round(lsvc_acc,3),
       '\nKappa: ', round(lsvc_kappa,3))
 ```
 
-    Accuraccy:  0.875 
-    MCC:  0.768 
-    Kappa:  0.75
+    Accuraccy:  0.799 
+    MCC:  0.556 
+    Kappa:  0.515
 
 
 #### Disease details Linear Support Vector Classifier
@@ -1474,21 +1305,20 @@ print('Accuraccy: ',round(lsvc_acc,3),
 disease_info(lsvc_classification, geo_transform)
 ```
 
-    Late blight afected area:  615.2 square meters
-    Healthy potato area:  416.82 square meters
-    Late blight vs Healthy potato area ratio:  1.48
-    Late blight area vs total area:  0.6
-    Healthy potato area vs total area:  0.4
+    Late blight afected area:  840.22 square meters
+    Healthy potato area:  189.72 square meters
+    Late blight vs Healthy potato area ratio:  4.43
+    Late blight area vs total area:  0.82
+    Healthy potato area vs total area:  0.18
 
 
 ___
-
-### K-Neighbors Classifier
+### K Neighbors Classifier
 
 
 ```python
 y_pred_knn = knn_classification.ravel()
-knn_table, knn_cm, knn_acc, knn_mcc, knn_kappa = corr_metrics(y_true, y_pred_knn)
+knn_table, knn_cm, knn_acc, knn_mcc, knn_kappa  = corr_metrics(y_true, y_pred_knn)
 knn_cm
 ```
 
@@ -1521,21 +1351,21 @@ knn_cm
   <tbody>
     <tr>
       <th>Predicted - Late blight plants</th>
-      <td>471622.0</td>
-      <td>173844.0</td>
-      <td>645466.0</td>
+      <td>416136.0</td>
+      <td>121061.0</td>
+      <td>537197.0</td>
     </tr>
     <tr>
       <th>Predicted - Healthy plants</th>
-      <td>21261.0</td>
-      <td>340796.0</td>
-      <td>362057.0</td>
+      <td>78355.0</td>
+      <td>154891.0</td>
+      <td>233246.0</td>
     </tr>
     <tr>
       <th>Total</th>
-      <td>492883.0</td>
-      <td>514640.0</td>
-      <td>1007523.0</td>
+      <td>494491.0</td>
+      <td>275952.0</td>
+      <td>770443.0</td>
     </tr>
   </tbody>
 </table>
@@ -1578,17 +1408,17 @@ knn_table
   <tbody>
     <tr>
       <th>Late blight plants</th>
-      <td>0.731</td>
-      <td>0.957</td>
-      <td>0.829</td>
-      <td>492883.0</td>
+      <td>0.775</td>
+      <td>0.842</td>
+      <td>0.807</td>
+      <td>494491.0</td>
     </tr>
     <tr>
       <th>Healthy plants</th>
-      <td>0.941</td>
-      <td>0.662</td>
-      <td>0.777</td>
-      <td>514640.0</td>
+      <td>0.664</td>
+      <td>0.561</td>
+      <td>0.608</td>
+      <td>275952.0</td>
     </tr>
   </tbody>
 </table>
@@ -1600,12 +1430,12 @@ knn_table
 ```python
 print('Accuraccy: ',round(knn_acc,3),
       '\nMCC: ', round(knn_mcc,3), 
-      '\nKappa: ', round(knn_kappa,3))
+      '\nKappa LB: ', round(knn_kappa,3))
 ```
 
-    Accuraccy:  0.806 
-    MCC:  0.645 
-    Kappa:  0.615
+    Accuraccy:  0.741 
+    MCC:  0.42 
+    Kappa LB:  0.417
 
 
 #### Disease details K-Neighbors Classifier
@@ -1615,16 +1445,13 @@ print('Accuraccy: ',round(knn_acc,3),
 disease_info(knn_classification, geo_transform)
 ```
 
-    Late blight afected area:  661.16 square meters
-    Healthy potato area:  370.86 square meters
-    Late blight vs Healthy potato area ratio:  1.78
-    Late blight area vs total area:  0.64
-    Healthy potato area vs total area:  0.36
-
+    Late blight afected area:  743.04 square meters
+    Healthy potato area:  286.9 square meters
+    Late blight vs Healthy potato area ratio:  2.59
+    Late blight area vs total area:  0.72
+    Healthy potato area vs total area:  0.28
 
 ___
-
-
 # References
 
 Glasbey, C.A., 1993.  An Analysis of Histogram-Based Thresholding Algorithms.

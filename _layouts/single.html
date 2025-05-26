@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/main.css">
+</head>
+<body>
+
+  <main class="wrapper">
+    <article class="page">
+      <header class="page-header">
+        <h1 class="page-title is-size-3 has-text-centered has-text-weight-bold">{{ page.title }}</h1>
+      </header>
+      <nav>
+        <ul>
+          <li><a href="/index.html">Home</a></li>
+        </ul>
+      </nav>
+      <section class="page-content">
+        {{ content }}
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <div class="wrapper">
+      <p><small>&copy; {{ site.time | date: '%Y' }} {{ site.name }}. All rights reserved.</small></p>
+    </div>
+  </footer>
+
+</body>
+</html>

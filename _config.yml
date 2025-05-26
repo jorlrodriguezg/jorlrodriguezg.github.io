@@ -1,1 +1,76 @@
-theme: jekyll-theme-slate
+# ------------------------------------------
+# Site identity
+# ------------------------------------------
+
+name: Jorge Luis Rodríguez Galvis
+description: Remote Sensing | AI | Biodiversity Monitoring
+url: "https://jorlrodriguezg.github.io"
+# baseurl: ""  # Only set if you're using a project page (not needed for user/organization pages)
+
+# ------------------------------------------
+# Profile and avatar
+# ------------------------------------------
+
+avatar: /Images/me_avatar.png  # Replace with the actual filename of your avatar image in the repo
+
+# ------------------------------------------
+# Footer links (displayed with icons)
+# ------------------------------------------
+
+footer-links:
+  email: jorlrodriguezg@gmail.com
+  github: jorlrodriguezg
+  linkedin:  # Add your LinkedIn handle or profile URL if you want
+  orcid: 0000-0002-9096-6591
+  google_scholar: "ILI0nZwAAAAJ"
+  researchgate: "Jorge-Rodriguez-Galvis-2"
+  rss:
+  twitter:  # Optional, add if active
+  youtube:
+  stackoverflow:
+
+# ------------------------------------------
+# Analytics & Comments
+# ------------------------------------------
+
+google_analytics:  # Add your tracking ID (e.g., UA-XXXXXXXX-X)
+disqus:  # Your Disqus shortname if you enable comments
+
+# ------------------------------------------
+# Markdown and styling
+# ------------------------------------------
+
+permalink: /
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+
+sass:
+  style: :compressed
+
+# ------------------------------------------
+# Plugins
+# ------------------------------------------
+
+plugins:
+  - jekyll-sitemap
+  # - jekyll-feed  # Optional, for RSS
+
+# ------------------------------------------
+# Build settings
+# ------------------------------------------
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - CNAME
+  - command.txt
+  - todo.txt
+  - _temp/
+  - _temp/index.html
+
+version: v1.2.0

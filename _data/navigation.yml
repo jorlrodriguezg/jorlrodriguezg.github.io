@@ -1,0 +1,9 @@
+main:
+  - title: "Home"
+    url: /index.html
+  - title: "Cirrus Correction"
+    url: /cirrus_correction.html
+  - title: "Potato Late Blight - Part 1"
+    url: /Mapping_potato_late_blight_from_UAV-based_multispectral_imagery.html
+  - title: "Potato Late Blight - Part 2"
+    url: /Multispectral_imagery_classification_using_pre-trained_models.html
