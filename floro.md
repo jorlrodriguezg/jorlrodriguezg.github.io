@@ -6,11 +6,15 @@ author_profile: true
 ---
 
 <p style="text-align: center;">
-Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, Kasper Johansen, Fernando T. Maestre and Matthew F. McCabe
+Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, Fida Thoker, Kasper Johansen, Bernard Ghanem, Fernando T. Maestre, and Matthew F. McCabe
 </p>
 
 <p style="text-align: center;"><i>
-Climate and Livability Initiative, Biological and Environmental Science and Engineering Division, King Abdullah University of Science and Technology, Thuwal, Saudi Arabia</i>
+Biological and Environmental Science and Engineering Division, King Abdullah University of Science and Technology, Thuwal, Saudi Arabia</i>
+</p>
+
+<p style="text-align: center;"><i>
+Computer, Electrical and Mathematical Science and Engineering Division, King Abdullah University of Science and Technology, Thuwal, Saudi Arabia</i>
 </p>
 
 <!-- Insert icons here -->
