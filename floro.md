@@ -19,7 +19,7 @@ Computer, Electrical and Mathematical Science and Engineering Division, King Abd
 
 <!-- Insert icons here -->
 <div style="text-align: center; margin: 1.5rem 0;">
-  <a href="#" title="Paper" class="external-link button is-normal is-rounded is-black" style="margin: 0 10px;">
+  <a href="https://arxiv.org/abs/2605.28174" title="Paper" class="external-link button is-normal is-rounded is-black" style="margin: 0 10px;">
   <span class="icon">
     <img src="/assets/icons/arxiv-logomark-small-white.svg" alt="Paper" width="24" height="24">
   </span>
@@ -37,7 +37,7 @@ Computer, Electrical and Mathematical Science and Engineering Division, King Abd
 
 ## **Overview**
 
-**FLORO:**, is a multimodal geospatial foundation model designed to learn transferable representations from a compact but highly diverse remote sensing corpus.
+**FLORO:** is a multimodal geospatial foundation model designed to learn transferable representations from a compact but highly diverse remote sensing corpus.
 
 FLORO is pretrained using masked autoencoding on heterogeneous Earth observation data, including multispectral satellite imagery, synthetic-aperture radar, high-resolution commercial imagery, UAV products, and terrain information. Rather than relying only on very large pretraining corpora, FLORO explores whether diversity across sensors, spatial resolutions, spectral configurations, and ecological settings can produce representations that transfer effectively across remote sensing tasks.
 
