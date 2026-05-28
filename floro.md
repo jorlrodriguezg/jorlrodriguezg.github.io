@@ -81,7 +81,17 @@ FLORO is pretrained on a heterogeneous collection of remote sensing observations
 - **Terrain and elevation products**, including global and local digital elevation or terrain-derived data.
 - **UAV RGB and multispectral products**, including very high-resolution orthomosaics, digital surface models, and vegetation-structure information.
 
-The objective is not only to increase the number of pretraining samples, but to increase the diversity of sensing conditions encountered during representation learning.
+![Pretraining data](assets/images/pretraining_data.png)
+
+> The objective is not only to increase the number of pretraining samples, but to increase the diversity of sensing conditions encountered during representation learning.
+
+---
+
+## 🔨 **Pretraining regime**
+
+FLORO is pretrained on approximately 80K remote sensing image samples spanning satellite, airborne, UAV, optical, SAR, and terrain-derived data sources. The model supports multispectral optical data, Sentinel-1 SAR backscatter, elevation products, UAV-derived structural information, and high-resolution imagery. FLORO learns by reconstructing masked content from partially observed multimodal inputs, encouraging the encoder to capture both spectral and spatial structure. Availability and validity channels allow the model to distinguish between observed, missing, and invalid data, supporting transfer across datasets with different sensor configurations.
+
+![Pretraining data](assets/images/pretraining_regime.png)
 
 ---
 
