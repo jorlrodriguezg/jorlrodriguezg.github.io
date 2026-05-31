@@ -297,7 +297,7 @@ Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, 
     <span>Paper</span>
   </a>
 
-  <a href="#" title="Code" class="floro-button">
+  <a href="https://github.com/jorlrodriguezg/floro" title="Code" class="floro-button">
     <img src="/assets/icons/github-mark-white.svg" alt="GitHub icon">
     <span>Code</span>
   </a>
