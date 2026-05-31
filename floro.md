@@ -277,10 +277,9 @@ author_profile: true
 
 <section class="floro-hero">
 
-<h1>FLORO: A Multimodal Geospatial Foundation Model for Ecological Remote Sensing Across Sensors and Scales</h1>
 
 <p class="subtitle">
-A compact but diverse foundation model for learning transferable representations from heterogeneous Earth observation data, with a focus on ecological and environmental remote sensing.
+A multimodal geospatial foundation model designed to learn transferable representations from a small but highly diverse remote sensing data , with a focus on ecological and environmental remote sensing.
 </p>
 
 <div class="floro-authors">
@@ -305,18 +304,6 @@ Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, 
 </div>
 
 </section>
-
-<div class="floro-stats">
-  <div class="floro-stat">
-    <span class="number">~80K</span>
-    <span class="label">pretraining samples</span>
-  </div>
-
-  <div class="floro-stat">
-    <span class="number">Multi-sensor</span>
-    <span class="label">satellite, UAV, SAR, terrain</span>
-  </div>
-</div>
 
 <section class="floro-section">
 
