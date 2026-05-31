@@ -129,8 +129,8 @@ author_profile: true
 
 .floro-stat .number {
   display: block;
-  font-size: 1.45rem;
-  font-weight: 800;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--floro-dark);
 }
 
