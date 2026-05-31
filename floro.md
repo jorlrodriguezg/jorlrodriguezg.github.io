@@ -129,8 +129,8 @@ author_profile: true
 
 .floro-stat .number {
   display: block;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--floro-dark);
 }
 
@@ -316,16 +316,6 @@ Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, 
     <span class="number">Multi-sensor</span>
     <span class="label">satellite, UAV, SAR, terrain</span>
   </div>
-
-  <div class="floro-stat">
-    <span class="number">PANGAEA</span>
-    <span class="label">standardized evaluation</span>
-  </div>
-
-  <div class="floro-stat">
-    <span class="number">Frozen encoder</span>
-    <span class="label">transfer protocol</span>
-  </div>
 </div>
 
 <section class="floro-section">
@@ -419,7 +409,6 @@ After pretraining, the shallow reconstruction decoders are discarded. The pretra
 FLORO is pretrained on a heterogeneous collection of remote sensing observations designed to expose the model to variation in spatial resolution, spectral coverage, sensing geometry, and ecological context.
 </p>
 
-<div class="floro-two-column">
 
 <div class="floro-card">
 <h3>Data sources</h3>
@@ -432,6 +421,14 @@ FLORO is pretrained on a heterogeneous collection of remote sensing observations
 </ul>
 </div>
 
+
+<figure class="floro-figure">
+  <img src="assets/images/pretraining_data.png" alt="FLORO pretraining data">
+  <figcaption class="floro-caption">
+    Overview of the heterogeneous pretraining data used to expose FLORO to diverse sensing conditions.
+  </figcaption>
+</figure>
+
 <div class="floro-card">
 <h3>Design motivation</h3>
 <p>
@@ -441,15 +438,6 @@ The objective is not only to increase the number of pretraining samples, but to 
 FLORO therefore emphasizes variation across sensors, spatial resolutions, spectral definitions, terrain conditions, and ecological contexts.
 </p>
 </div>
-
-</div>
-
-<figure class="floro-figure">
-  <img src="assets/images/pretraining_data.png" alt="FLORO pretraining data">
-  <figcaption class="floro-caption">
-    Overview of the heterogeneous pretraining data used to expose FLORO to diverse sensing conditions.
-  </figcaption>
-</figure>
 
 </section>
 
@@ -541,7 +529,6 @@ This design is motivated by ecological remote sensing, where downstream tasks of
   <li>Modality flexibility</li>
   <li>Ecological relevance</li>
   <li>Transferability under limited downstream adaptation</li>
-  <li>Compatibility with standardized benchmark evaluation</li>
 </ul>
 
 </section>
