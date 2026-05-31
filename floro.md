@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "FLORO: A Multimodal Geospatial Foundation Model for Ecological Remote Sensing Across Sensors and Scales"
+title: "FLORO"
 permalink: /floro/
 author_profile: true
 ---
@@ -279,7 +279,7 @@ author_profile: true
 
 
 <p class="subtitle">
-A multimodal geospatial foundation model designed to learn transferable representations from a small but highly diverse remote sensing data , with a focus on ecological and environmental remote sensing.
+A Multimodal Geospatial Foundation Model for Ecological Remote Sensing Across Sensors and Scales
 </p>
 
 <div class="floro-authors">
