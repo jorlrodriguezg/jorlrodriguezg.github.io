@@ -283,7 +283,7 @@ A multimodal geospatial foundation model designed to learn transferable represen
 </p>
 
 <div class="floro-authors">
-Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, Fida Thoker, Kasper Johansen, Bernard Ghanem, Fernando T. Maestre, and Matthew F. McCabe
+Jorge L. Rodríguez, Victor Angulo-Morales, Areej Alwahas, Mariana Elías-Lara, Fida Mohammad Thoker, Kasper Johansen, Bernard Ghanem, Fernando T. Maestre, and Matthew F. McCabe
 </div>
 
 <div class="floro-affiliations">

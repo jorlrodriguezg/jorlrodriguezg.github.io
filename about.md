@@ -16,7 +16,7 @@ I also collaborate on developing automated workflows for vegetation biomass esti
 
 ## Current Projects
 
-- **FLORO** (Foundation Learning Of Remote Sensing Observations for Ecological Research)  
+- **FLORO:** A Multimodal Geospatial Foundation Model for Ecological Remote Sensing Across Sensors and Scales  
   A multimodal, multitask Vision Transformer model trained on 400K+ remote sensing tiles to support ecological applications like vegetation classification and biomass estimation in drylands. [Learn more →](/floro/)
 
 - **Historical Biodiversity Monitoring**  
